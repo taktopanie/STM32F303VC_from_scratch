@@ -3,8 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include<timer_lib.h>
-#include<MY_interrupt.h>
+#include <MY_interrupt.h>
+#include <TIMER_lib.h>
 
 void GPIOInits(void){
 	GPIO_Handle_t GPIOPins;
@@ -38,23 +38,22 @@ void GPIOInits(void){
 	GPIO_WritePort(GPIOE, GPIO_PIN_SET);
 }
 
-
-
-
-
-
-
 int main (void){
 
 	//INIT
 	printf("HELLO WORLD \n");
 	GPIOInits();
-	Timer2_Init();
 
-	TIMER2_interrupt_set();
+	Timer_Handle_t timer;
+	timer.TIMER = TIMER2;
+	timer.TIM_ARR = 1000;
+	timer.TIM_prescaler = 8000;
+
+	Timer_Init(&timer);
+	TIMER_interrupt_set(timer.TIMER);
 
 
-	//Timer_RegDef *wsk_TIM = (Timer_RegDef*)0x40000000UL;
+
 
 	while(1){
 		//printf("%ld\n", wsk_TIM->TIMx_CNT);
@@ -64,13 +63,26 @@ int main (void){
 
 void TIM2_IRQHandler(void){
 //Reset timer flag
-Timer_RegDef *wsk_TIM = (Timer_RegDef*)0x40000000UL;
-wsk_TIM->TIMx_SR &= ~(1<<0);
+
+TIMER2->TIMx_SR &= ~(1<<0);
 static int zmienna = 8;
 
 GPIO_TogglePin(GPIOE, zmienna++);
 if(zmienna == 16){
 	zmienna = 8;
+	}
+
+}
+
+void TIM3_IRQHandler(void){
+
+//Reset timer flag
+TIMER3->TIMx_SR &= ~(1<<0);
+static int zmienna = 8;
+
+GPIO_TogglePin(GPIOE, zmienna--);
+if(zmienna == 7){
+	zmienna = 15;
 	}
 
 }
