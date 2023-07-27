@@ -21,7 +21,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include<timer_lib.h>
+#include<TIMER_lib.h>
 #include<MY_interrupt.h>
 
 void GPIOInits(void){
@@ -58,7 +58,12 @@ int main (void){
 	PeriClockControl(GPIOA, CLOCK_ENABLE);
 
 	GPIOInits();
-	Timer2_Init();
+
+	Timer_Handle_t timer;
+	timer.TIMER = TIMER2;
+
+	Timer2_Init(&timer);
+
 	Timer_RegDef *wsk_TIM = (Timer_RegDef*)0x40000000UL;
 	int var_old = 0;
 	volatile long int var_curr = wsk_TIM->TIMx_CR1;
