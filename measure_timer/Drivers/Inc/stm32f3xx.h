@@ -9,7 +9,7 @@
 #define STM32F3XX_H_
 
 #include <stddef.h>
-
+#include <stdint.h>
 /*
  * Function definitons
  */

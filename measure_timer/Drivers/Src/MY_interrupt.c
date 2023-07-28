@@ -3,13 +3,21 @@
 
 #include<stm32f3xx.h>
 
-void TIMER2_interrupt_set(void){
+void TIMER_interrupt_set(Timer_RegDef* wsk_tim){
 	uint32_t * wsk;
+	wsk = (uint32_t*)(NVIC_VECT_0);
 
-	//28 line interrupt TIM2
-	wsk = (uint32_t*)(0xE000E100);
-	*wsk |= (1<< 28);
-
+	//Enable NVIC interrupt
+	if(wsk_tim == TIMER2){
+		//28 line interrupt TIM2
+		*wsk |= (1<< 28);
+	}else if(wsk_tim == TIMER3){
+		//29 line interrupt TIM3
+		*wsk |= (1<< 29);
+	}else if(wsk_tim == TIMER4){
+		//30 line interrupt TIM4
+		*wsk |= (1<< 30);
+	}
 }
 
 void GPIO_interrupt_set(void){

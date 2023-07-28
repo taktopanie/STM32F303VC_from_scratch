@@ -20,23 +20,24 @@
 #include <GPIO_lib.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
+
 
 #include<TIMER_lib.h>
 #include<MY_interrupt.h>
 
+
+typedef struct timer_time{
+			uint16_t hours;
+			uint8_t minutes;
+			uint8_t seconds;
+			uint8_t ms;
+		}timer_time;
+
 void GPIOInits(void){
 	GPIO_Handle_t GPIOPins;
 
-	GPIOPins.GPIO_Regdef = GPIOE;
-	GPIOPins.GPIO_config.Pin_Mode = GPIO_MODE_OUTPUT;
-	GPIOPins.GPIO_config.Pin_Output_Type = GPIO_PUSH_PULL;
-	GPIOPins.GPIO_config.Pin_Pull= GPIO_PULL_DOWN;
-	GPIOPins.GPIO_config.Pin_Speed = GPIO_SPEED_HIGH;
-
-
-	GPIOPins.GPIO_config.Pin_Number = GPIO_PIN_15;
-	GPIO_Init(&GPIOPins);
-
+	//PUSH_BUTTON
 	GPIOPins.GPIO_Regdef = GPIOA;
 	GPIOPins.GPIO_config.Pin_Mode = GPIO_MODE_ALTERNATE;
 	GPIOPins.GPIO_config.Pin_Output_Type = GPIO_PUSH_PULL;
@@ -46,7 +47,32 @@ void GPIOInits(void){
 	GPIOPins.GPIO_config.Pin_Number = GPIO_PIN_0;
 	GPIO_Init(&GPIOPins);
 
+	GPIOPins.GPIO_Regdef = GPIOE;
+	GPIOPins.GPIO_config.Pin_Mode = GPIO_MODE_OUTPUT;
+	GPIOPins.GPIO_config.Pin_Output_Type = GPIO_PUSH_PULL;
+	GPIOPins.GPIO_config.Pin_Pull= GPIO_PULL_DOWN;
+	GPIOPins.GPIO_config.Pin_Speed = GPIO_SPEED_HIGH;
+
+	//STM32_LEDS
+	GPIOPins.GPIO_config.Pin_Number = GPIO_PIN_8;
+	GPIO_Init(&GPIOPins);
+	GPIOPins.GPIO_config.Pin_Number = GPIO_PIN_9;
+	GPIO_Init(&GPIOPins);
+	GPIOPins.GPIO_config.Pin_Number = GPIO_PIN_10;
+	GPIO_Init(&GPIOPins);
+	GPIOPins.GPIO_config.Pin_Number = GPIO_PIN_11;
+	GPIO_Init(&GPIOPins);
+	GPIOPins.GPIO_config.Pin_Number = GPIO_PIN_12;
+	GPIO_Init(&GPIOPins);
+	GPIOPins.GPIO_config.Pin_Number = GPIO_PIN_13;
+	GPIO_Init(&GPIOPins);
+	GPIOPins.GPIO_config.Pin_Number = GPIO_PIN_14;
+	GPIO_Init(&GPIOPins);
+	GPIOPins.GPIO_config.Pin_Number = GPIO_PIN_15;
+	GPIO_Init(&GPIOPins);
+
 	GPIO_WritePort(GPIOE, GPIO_PIN_SET);
+
 }
 
 
@@ -59,26 +85,72 @@ int main (void){
 
 	GPIOInits();
 
-	Timer_Handle_t timer;
-	timer.TIMER = TIMER2;
+	Timer_Handle_t timer_2;
+	Timer_Handle_t timer_3;
 
-	Timer2_Init(&timer);
+////TIMER2////
+	timer_2.TIMER = TIMER2;
+	//MAX arr value
+	timer_2.TIM_ARR = 0xFFFFFFFFUL;
+	//8 000 000 / 8000 = 1000 =>  0.1ms precision
+	timer_2.TIM_prescaler = (8000-1);
+	timer_2.TIM_Counter_mode = COUNTER_MODE_UP;
 
-	Timer_RegDef *wsk_TIM = (Timer_RegDef*)0x40000000UL;
-	int var_old = 0;
-	volatile long int var_curr = wsk_TIM->TIMx_CR1;
+	Timer_Init_INPUT_CC_MODE(&timer_2);
+	TIMER_interrupt_set(timer_2.TIMER);
+///////////////
+
+/////TIMER3////
+	timer_3.TIMER = TIMER3;
+	timer_3.TIM_ARR = (1000-1);
+	timer_3.TIM_prescaler = (800-1);
+	timer_3.TIM_Counter_mode= COUNTER_MODE_DOWN;
+
+	Timer_Init_FREE_RUN(&timer_3);
+	TIMER_interrupt_set(timer_3.TIMER);
+////////////////
+
 	while(1){
-		var_curr = wsk_TIM->TIMx_CCR1;
-
-		if(var_curr != var_old){
-			printf("TIME DIFF: %ld\n", var_curr-var_old);
-			var_old = var_curr;
-
-
-		}
-
-		// TODO: SR + interrupt
 	}
 	return 0;
 }
 
+
+
+void TIM2_IRQHandler(){
+
+	Timer_Handle_t timer_2;
+	timer_2.TIMER = TIMER2;
+	//CLEAN the interrupt FLAG
+	timer_2.TIMER->TIMx_SR &= ~(0x1F);
+
+	static int var_old = 0;
+	volatile long int var_curr = timer_2.TIMER->TIMx_CR1;
+
+	var_curr = timer_2.TIMER->TIMx_CCR1;
+
+	if(var_curr != var_old){
+		long int MS_seconds = ((var_curr-var_old)/10);
+
+		timer_time diff_time;
+		diff_time.hours = (MS_seconds/100/3600);
+		diff_time.minutes = ((MS_seconds)/100/60)%60;
+		diff_time.seconds = ((MS_seconds)/100)%60;
+		diff_time.ms= MS_seconds%100;
+
+		printf("Time diff: %02d:%02d:%02d:%02d\n", diff_time.hours, diff_time.minutes, diff_time.seconds, diff_time.ms);
+		var_old = var_curr;
+	}
+
+}
+
+void TIM3_IRQHandler(){
+	//Reset timer flag
+	TIMER3->TIMx_SR &= ~(1<<0);
+	static int zmienna = 8;
+
+	GPIO_TogglePin(GPIOE, zmienna++);
+	if(zmienna == 16){
+		zmienna = 8;
+		}
+}

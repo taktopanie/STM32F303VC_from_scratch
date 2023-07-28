@@ -8,7 +8,11 @@
 #include <stdint.h>
 #include <TIMER_lib.h>
 
-void Timer_Clock_update(Timer_RegDef* timer){
+/*
+ *
+ */
+
+void __Timer_Clock_update(Timer_RegDef* timer){
 	//Turn on TIM clock
 	if(timer == TIMER2){
 		RCC->APB1ENR |= (1<<0);
@@ -19,31 +23,56 @@ void Timer_Clock_update(Timer_RegDef* timer){
 	}
 }
 
+void __Timer_update_reg(Timer_RegDef* timer){
 
-void Timer_Init(Timer_Handle_t* TIMER_handler){
+	//update shadow values
+	timer->TIMx_EGR |= (1<<0);
+	//wait while UG flag set
+	while(!(timer->TIMx_SR & (1<<0)));
+	//cleare the flags
+	timer->TIMx_SR &= ~(0x1F<<0);
 
-	Timer_Clock_update(TIMER_handler->TIMER);
+	//wait till flag set
+	while(timer->TIMx_SR & (1<<0));
+}
+
+/*
+*
+*
+*
+*/
+void Timer_Init_FREE_RUN(Timer_Handle_t* TIMER_handler){
+
+	__Timer_Clock_update(TIMER_handler->TIMER);
+
+	//set counte mode
+	TIMER_handler->TIMER->TIMx_CR1 |= (TIMER_handler->TIM_Counter_mode << 4);
 
 	//set ARR and PRESCALER
 	TIMER_handler->TIMER->TIMx_ARR = TIMER_handler->TIM_ARR;
 	TIMER_handler->TIMER->TIMx_PSC |= TIMER_handler->TIM_prescaler;
+
+	//update shadow values
+	__Timer_update_reg(TIMER_handler->TIMER);
+
+	if(TIMER_handler->TIM_OnePulse_mode != 0){
+		TIMER_handler->TIMER->TIMx_CR1 |= (1 << 3);
+	}
 
 	//allow to generate update
 	TIMER_handler->TIMER->TIMx_DIER |= (1<<0);
 
 	//turn on TIMER
 	TIMER_handler->TIMER->TIMx_CR1 |= (1<<0);
-
-	//update shadow values
-	TIMER_handler->TIMER->TIMx_EGR |= (1<<0);
 }
 
-void Timer2_Init(Timer_Handle_t* TIMER_handler){
+void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler){
 
-	//Turn on TIM2 clock
-	Timer_Clock_update(TIMER_handler->TIMER);
+	//Turn on the TIM clock
+	__Timer_Clock_update(TIMER_handler->TIMER);
 
-	//counter mode up == DEFAULT
+	//counter mode
+	TIMER_handler->TIMER->TIMx_CR1 |= (TIMER_handler->TIM_Counter_mode << 4);
 
 	//no prescaler == DEFAULT
 
@@ -55,10 +84,12 @@ void Timer2_Init(Timer_Handle_t* TIMER_handler){
 	TIMER_handler->TIMER->TIMx_CCMR1 |= (1<<0);
 
 	//set prescaler to 1 ms precision
-	TIMER_handler->TIMER->TIMx_PSC = (64000);
+	TIMER_handler->TIMER->TIMx_PSC = TIMER_handler->TIM_prescaler;
 
 	//ARR max value
-	TIMER_handler->TIMER->TIMx_ARR = 0xFFFFFFFFUL;
+	TIMER_handler->TIMER->TIMx_ARR = TIMER_handler->TIM_ARR;
+
+	__Timer_update_reg(TIMER_handler->TIMER);
 
 	//allow to generate update
 	TIMER_handler->TIMER->TIMx_DIER |= (1<<0);
@@ -66,14 +97,10 @@ void Timer2_Init(Timer_Handle_t* TIMER_handler){
 	//enable CCR1 interupt
 	TIMER_handler->TIMER->TIMx_DIER |= (1<<1);
 
-	//turn on TIM2
+	//turn on the TIM
 	TIMER_handler->TIMER->TIMx_CR1 |= (1<<0);
-
-	//update shadow values
-	TIMER_handler->TIMER->TIMx_EGR |= (1<<0);
 
 	// enable C/C interrupt
 	TIMER_handler->TIMER->TIMx_CCER |= (1<<0);
-
 
 }
