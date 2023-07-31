@@ -11,9 +11,23 @@
 #include<stm32f3xx.h>
 
 #define __vo volatile
-#define COUNTER_MODE_UP			0
-#define COUNTER_MODE_DOWN		1
 
+#define COUNTER_MODE_UP					0
+#define COUNTER_MODE_DOWN				1
+
+#define TIM_EDGE_RISING					0
+#define TIM_EDGE_FALLING				1
+#define TIM_EDGE_BOTH					2
+
+#define TIM_INTERRUPT_1_EVENT 			0
+#define TIM_INTERRUPT_2_EVENT			1
+#define TIM_INTERRUPT_4_EVENT			2
+#define TIM_INTERRUPT_8_EVENT			3
+
+#define TIM_FILTERING_NO				0x0
+#define TIM_FILTERING_LOW				0x3
+#define TIM_FILTERING_MEDIUM			0x9
+#define TIM_FILTERING_HIGH				0xF
 
 typedef struct{
 Timer_RegDef* TIMER;
@@ -21,6 +35,9 @@ uint16_t TIM_prescaler;
 uint32_t TIM_ARR;
 uint8_t TIM_Counter_mode;
 uint8_t	TIM_OnePulse_mode;
+uint8_t TIM_Edge_trigger;
+uint8_t TIM_INT_PRSC;
+uint8_t TIM_FILTERING;
 }Timer_Handle_t;
 
 /*
@@ -45,12 +62,12 @@ void Timer_Init_FREE_RUN(Timer_Handle_t* TIMER_handler);
  *  - TIMER_handler->TIM_prescaler
  *  - TIMER_handler->TIMER
  *	- TIMER_handler->counter mode
+ *	- TIMER_handler->TIM_Edge_trigger
+ *	- TIMER_handler->TIM_INT_PRSC
+ *	- TIMER_handler->TIM_FILTERING
  *
- *  TODO: Rest of the settings will be added
+ *  // Rest of the settings will be added when will be needed (different channels... etc..)
  *
- *	- TIMER_handler->RISING EDGE
- *	- TIMER_handler->filter
- *	- TIMER_handler->TI1 input
  */
 void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler);
 

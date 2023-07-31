@@ -95,7 +95,9 @@ int main (void){
 	//8 000 000 / 8000 = 1000 =>  0.1ms precision
 	timer_2.TIM_prescaler = (8000-1);
 	timer_2.TIM_Counter_mode = COUNTER_MODE_UP;
-
+	timer_2.TIM_Edge_trigger = TIM_EDGE_RISING;
+	timer_2.TIM_INT_PRSC = TIM_INTERRUPT_1_EVENT;
+	timer_2.TIM_FILTERING = TIM_FILTERING_NO;
 	Timer_Init_INPUT_CC_MODE(&timer_2);
 	TIMER_interrupt_set(timer_2.TIMER);
 ///////////////
@@ -122,7 +124,7 @@ void TIM2_IRQHandler(){
 	Timer_Handle_t timer_2;
 	timer_2.TIMER = TIMER2;
 	//CLEAN the interrupt FLAG
-	timer_2.TIMER->TIMx_SR &= ~(0x1F);
+	timer_2.TIMER->TIMx_SR &= ~(0x2);
 
 	static int var_old = 0;
 	volatile long int var_curr = timer_2.TIMER->TIMx_CR1;

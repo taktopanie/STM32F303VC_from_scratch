@@ -116,11 +116,24 @@ int main (void){
 	Timer_Init_PWM_MODE(&timer_2);
 	TIMER_interrupt_set(timer_2.TIMER);
 
+//
+//	timer_2.TIMER = TIMER2;
+//	timer_2.TIM_ARR = 0xFFFFFFFFUL;
+//	timer_2.TIM_PRESCALLER = (8000-1);
+//	timer_2.TIM_COUNTER_mode = COUNTER_MODE_UP;
+//	timer_2.TIM_EDGE_TRIGGER = TIM_EDGE_RISING;
+//	timer_2.TIM_INT_PRSC = TIM_INTERRUPT_1_EVENT;
+//	timer_2.TIM_FILTERING = TIM_FILTERING_NO;
+//	timer_2.TIM_ONEPULSE = 0;
+//	Timer_Init_INPUT_CC_MODE(&timer_2);
+//	TIMER_interrupt_set(timer_2.TIMER);
+
 	////TIMER3////
 	timer_3.TIMER = TIMER3;
 	timer_3.TIM_ARR = (1000-1);
 	timer_3.TIM_PRESCALLER = (8000-1);
 	timer_3.TIM_COUNTER_mode = COUNTER_MODE_UP;
+	timer_3.TIM_ONEPULSE = 0;
 	Timer_Init_FREE_RUN(&timer_3);
 	TIMER_interrupt_set(timer_3.TIMER);
 
@@ -129,6 +142,7 @@ int main (void){
 	timer_4.TIM_ARR = (100-1);
 	timer_4.TIM_PRESCALLER = (8000-1);
 	timer_4.TIM_COUNTER_mode = COUNTER_MODE_UP;
+	timer_4.TIM_ONEPULSE = 0;
 	Timer_Init_FREE_RUN(&timer_4);
 	TIMER_interrupt_set(timer_4.TIMER);
 
@@ -138,6 +152,32 @@ int main (void){
 	return 0;
 }
 
+//void TIM2_IRQHandler(){
+//
+//	Timer_Handle_t timer_2;
+//	timer_2.TIMER = TIMER2;
+//	//CLEAN the interrupt FLAG
+//	timer_2.TIMER->TIMx_SR &= ~(0x2);
+//
+//	static int var_old = 0;
+//	volatile long int var_curr = timer_2.TIMER->TIMx_CR1;
+//
+//	var_curr = timer_2.TIMER->TIMx_CCR1;
+//
+//	if(var_curr != var_old){
+//		long int MS_seconds = ((var_curr-var_old)/10);
+//
+//		timer_time diff_time;
+//		diff_time.hours = (MS_seconds/100/3600);
+//		diff_time.minutes = ((MS_seconds)/100/60)%60;
+//		diff_time.seconds = ((MS_seconds)/100)%60;
+//		diff_time.ms= MS_seconds%100;
+//
+//		printf("Time diff: %02d:%02d:%02d:%02d\n", diff_time.hours, diff_time.minutes, diff_time.seconds, diff_time.ms);
+//		var_old = var_curr;
+//	}
+//
+//}
 
 void TIM3_IRQHandler(){
 

@@ -38,8 +38,7 @@ void __Timer_update_reg(Timer_RegDef* timer){
 
 /*
 *
-*
-*
+* free_run function
 */
 void Timer_Init_FREE_RUN(Timer_Handle_t* TIMER_handler){
 
@@ -74,25 +73,35 @@ void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler){
 	//counter mode
 	TIMER_handler->TIMER->TIMx_CR1 |= (TIMER_handler->TIM_COUNTER_mode << 4);
 
-	//no prescaler == DEFAULT
+	//TRIGGER EDGE
+	if(TIMER_handler->TIM_EDGE_TRIGGER == TIM_EDGE_RISING){
+		TIMER_handler->TIMER->TIMx_CCER &= ~(5 << 1);
+	}else if(TIMER_handler->TIM_EDGE_TRIGGER == TIM_EDGE_FALLING){
+		TIMER_handler->TIMER->TIMx_CCER &= ~(5 << 1);
+		TIMER_handler->TIMER->TIMx_CCER |= (1 << 1);
+	}else if(TIMER_handler->TIM_EDGE_TRIGGER == TIM_EDGE_BOTH){
+		TIMER_handler->TIMER->TIMx_CCER &= ~(5 << 1);
+		TIMER_handler->TIMER->TIMx_CCER |= (5 << 1);
+	}
 
-	//RISING EDGE == DEFAULT
+	//FILTERING (noise reduction)
+	TIMER_handler->TIMER->TIMx_CCMR1 |= (TIMER_handler->TIM_FILTERING<<4);
 
-	//no filter == DEFAULT
+	//INPUT PRESCALLER - CAPTURE MADE EVERY x EVENTS
+	TIMER_handler->TIMER->TIMx_CCMR1 &= ~(3<<2);
+	TIMER_handler->TIMER->TIMx_CCMR1 |= (TIMER_handler->TIM_INT_PRSC<<2);
 
-	//TI1 input
+	//TI1 input selection
 	TIMER_handler->TIMER->TIMx_CCMR1 |= (1<<0);
 
-	//set prescaler to 1 ms precision
+	//set prescaler
 	TIMER_handler->TIMER->TIMx_PSC = TIMER_handler->TIM_PRESCALLER;
 
-	//ARR max value
+	//set TIMER ARR
 	TIMER_handler->TIMER->TIMx_ARR = TIMER_handler->TIM_ARR;
 
-	__Timer_update_reg(TIMER_handler->TIMER);
 
-	//allow to generate update
-	TIMER_handler->TIMER->TIMx_DIER |= (1<<0);
+	__Timer_update_reg(TIMER_handler->TIMER);
 
 	//enable CCR1 interupt
 	TIMER_handler->TIMER->TIMx_DIER |= (1<<1);
@@ -100,9 +109,10 @@ void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler){
 	//turn on the TIM
 	TIMER_handler->TIMER->TIMx_CR1 |= (1<<0);
 
-	// enable C/C interrupt
+	// enable CC channel 1 capture enable
 	TIMER_handler->TIMER->TIMx_CCER |= (1<<0);
 
+	// differentiate INPUT CHANNELS == maybe in the future
 }
 
 void Timer_Init_PWM_MODE(Timer_Handle_t* TIMER_handler){

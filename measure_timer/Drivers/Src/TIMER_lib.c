@@ -74,16 +74,33 @@ void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler){
 	//counter mode
 	TIMER_handler->TIMER->TIMx_CR1 |= (TIMER_handler->TIM_Counter_mode << 4);
 
-	//no prescaler == DEFAULT
+	//TRIGGER EDGE
+	if(TIMER_handler->TIM_Edge_trigger == TIM_EDGE_RISING){
+		TIMER_handler->TIMER->TIMx_CCER &= ~(5 << 1);
+	}else if(TIMER_handler->TIM_Edge_trigger == TIM_EDGE_FALLING){
+		TIMER_handler->TIMER->TIMx_CCER &= ~(5 << 1);
+		TIMER_handler->TIMER->TIMx_CCER |= (1 << 1);
+	}else if(TIMER_handler->TIM_Edge_trigger == TIM_EDGE_BOTH){
+		TIMER_handler->TIMER->TIMx_CCER &= ~(5 << 1);
+		TIMER_handler->TIMER->TIMx_CCER |= (5 << 1);
+	}
 
-	//RISING EDGE == DEFAULT
 
-	//no filter == DEFAULT
+	//FILTERING (noise reduction)
+	TIMER_handler->TIMER->TIMx_CCMR1 |= (TIMER_handler->TIM_FILTERING<<4);
+
+	//TI2 FILTERING
+	//TIMER_handler->TIMER->TIMx_CCMR1 |= (TIMER_handler->TIM_FILTERING<<12);
+
+	//INPUT PRESCALLER - CAPTURE MADE EVERY x EVENTS
+	TIMER_handler->TIMER->TIMx_CCMR1 |= (TIMER_handler->TIM_INT_PRSC<<2);
 
 	//TI1 input
 	TIMER_handler->TIMER->TIMx_CCMR1 |= (1<<0);
+	// TI2 INPUT
+	//TIMER_handler->TIMER->TIMx_CCMR1 |= (1<<1);
 
-	//set prescaler to 1 ms precision
+	//set prescaler
 	TIMER_handler->TIMER->TIMx_PSC = TIMER_handler->TIM_prescaler;
 
 	//ARR max value
@@ -92,7 +109,7 @@ void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler){
 	__Timer_update_reg(TIMER_handler->TIMER);
 
 	//allow to generate update
-	TIMER_handler->TIMER->TIMx_DIER |= (1<<0);
+	//TIMER_handler->TIMER->TIMx_DIER |= (1<<0);
 
 	//enable CCR1 interupt
 	TIMER_handler->TIMER->TIMx_DIER |= (1<<1);
@@ -100,7 +117,7 @@ void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler){
 	//turn on the TIM
 	TIMER_handler->TIMER->TIMx_CR1 |= (1<<0);
 
-	// enable C/C interrupt
+	// enable CC channel 1 capture enable
 	TIMER_handler->TIMER->TIMx_CCER |= (1<<0);
 
 }
