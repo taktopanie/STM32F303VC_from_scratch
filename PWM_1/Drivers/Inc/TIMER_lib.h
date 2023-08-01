@@ -29,19 +29,24 @@
 #define TIM_FILTERING_HIGH				0xF
 
 typedef struct{
-Timer_RegDef* TIMER;
-uint16_t TIM_PRESCALLER;
-uint32_t TIM_ARR;
-uint8_t TIM_COUNTER_mode;
-uint8_t	TIM_ONEPULSE;
-uint8_t TIM_EDGE_TRIGGER;
-uint8_t TIM_INT_PRSC;
-uint8_t TIM_FILTERING;
-uint8_t TIM_PWM_INVERTED_MODE;
-uint8_t TIM_PWM_WIDTH_PERCENT;
-
-
+	Timer_RegDef* TIMER;
+	uint16_t TIM_PRESCALLER;
+	uint32_t TIM_ARR;
+	uint8_t TIM_COUNTER_mode;
+	uint8_t	TIM_ONEPULSE;
+	uint8_t TIM_EDGE_TRIGGER;
+	uint8_t TIM_INT_PRSC;
+	uint8_t TIM_FILTERING;
+	uint8_t TIM_PWM_INVERTED_MODE;
+	uint8_t TIM_PWM_WIDTH_PERCENT;
 }Timer_Handle_t;
+
+typedef struct{
+	uint16_t hours;
+	uint8_t minutes;
+	uint8_t seconds;
+	uint8_t ms;
+}timer_time;
 
 /*
  * Timer free run configuration function - counts to a given time and generates interrupt
@@ -53,7 +58,8 @@ uint8_t TIM_PWM_WIDTH_PERCENT;
  *
  *  optional:
  *  - TIMER_handler->TIM_OnePulse_mode
- *  TODO: Rest of the settings will be added SOON
+ *
+ *   Rest of the settings will be added when needed
  *
  */
 void Timer_Init_FREE_RUN(Timer_Handle_t* TIMER_handler);
@@ -87,5 +93,17 @@ void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler);
  */
 void Timer_Init_PWM_MODE(Timer_Handle_t* TIMER_handler);
 
+/*
+ * Timer IRQ handling
+ * @param TIMER_handler - pointer to active TIMER address
+ *
+ */
+void Timer_IRQ_handling(Timer_RegDef* TIMER_handler);
+
+/*
+ * Timer printing time function
+ *
+ */
+void Timer_indicate_time(Timer_RegDef* timer);
 
 #endif /* INC_TIMER_LIB_H_ */

@@ -6,6 +6,8 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
+#include <time.h>
 #include <TIMER_lib.h>
 
 /*
@@ -142,8 +144,10 @@ void Timer_Init_PWM_MODE(Timer_Handle_t* TIMER_handler){
 	}
 
 	//PWM width percent
-	uint8_t tmp_percent = (TIMER_handler->TIMER->TIMx_ARR + 1)*(TIMER_handler->TIM_PWM_WIDTH_PERCENT)/100;
+	uint32_t tmp_percent = (TIMER_handler->TIMER->TIMx_ARR + 1)*(TIMER_handler->TIM_PWM_WIDTH_PERCENT)/100;
+	TIMER_handler->TIMER->TIMx_CCR2 &= ~(0xFFFFFFFF);
 	TIMER_handler->TIMER->TIMx_CCR2 |= tmp_percent;
+
 
 	__Timer_update_reg(TIMER_handler->TIMER);
 
@@ -153,4 +157,83 @@ void Timer_Init_PWM_MODE(Timer_Handle_t* TIMER_handler){
 
 	// enable C/C output
 	TIMER_handler->TIMER->TIMx_CCER |= (1<<4);
+}
+
+void Timer_IRQ_handling(Timer_RegDef* TIMER_pointer){
+
+	//UIF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<0)){
+		TIMER_pointer->TIMx_SR &= ~(1<<0);
+		//body of particular irq
+	}
+
+	//OC1IF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<1)){
+		TIMER_pointer->TIMx_SR &= ~(1<<1);
+	}
+
+	//OC2IF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<2)){
+		TIMER_pointer->TIMx_SR &= ~(1<<2);
+	}
+
+	//OC3IF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<3)){
+		TIMER_pointer->TIMx_SR &= ~(1<<3);
+	}
+
+	//OC4IF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<4)){
+		TIMER_pointer->TIMx_SR &= ~(1<<4);
+	}
+
+	//TIF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<6)){
+		TIMER_pointer->TIMx_SR &= ~(1<<6);
+	}
+
+	//CC1OF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<9)){
+		TIMER_pointer->TIMx_SR &= ~(1<<9);
+	}
+
+	//CC2OF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<10)){
+		TIMER_pointer->TIMx_SR &= ~(1<<10);
+	}
+
+	//CC3OF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<11)){
+		TIMER_pointer->TIMx_SR &= ~(1<<11);
+	}
+
+	//CC4OF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<12)){
+		TIMER_pointer->TIMx_SR &= ~(1<<12);
+	}
+
+}
+
+void Timer_indicate_time(Timer_RegDef* timer){
+
+	//CLEAN the interrupt FLAG
+	Timer_IRQ_handling(timer);
+
+	static int var_old = 0;
+	volatile long int var_curr = timer->TIMx_CR1;
+
+	var_curr = timer->TIMx_CCR1;
+
+	if(var_curr != var_old){
+		long int MS_seconds = ((var_curr-var_old)/10);
+
+		timer_time diff_time;
+		diff_time.hours = (MS_seconds/100/3600);
+		diff_time.minutes = ((MS_seconds)/100/60)%60;
+		diff_time.seconds = ((MS_seconds)/100)%60;
+		diff_time.ms= MS_seconds%100;
+
+		printf("Time diff: %02d:%02d:%02d:%02d\n", diff_time.hours, diff_time.minutes, diff_time.seconds, diff_time.ms);
+		var_old = var_curr;
+	}
 }
