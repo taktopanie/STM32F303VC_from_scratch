@@ -36,7 +36,7 @@ void Timer_Clock_update(Timer_RegDef* timer);
  *
  *  optional:
  *  - TIMER_handler->TIM_OnePulse_mode
- *  TODO: Rest of the settings will be added
+ *
  *
  */
 void Timer_Init(Timer_Handle_t* TIMER_handler);

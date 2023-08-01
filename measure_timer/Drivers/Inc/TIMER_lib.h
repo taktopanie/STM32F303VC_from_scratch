@@ -30,15 +30,22 @@
 #define TIM_FILTERING_HIGH				0xF
 
 typedef struct{
-Timer_RegDef* TIMER;
-uint16_t TIM_prescaler;
-uint32_t TIM_ARR;
-uint8_t TIM_Counter_mode;
-uint8_t	TIM_OnePulse_mode;
-uint8_t TIM_Edge_trigger;
-uint8_t TIM_INT_PRSC;
-uint8_t TIM_FILTERING;
+	Timer_RegDef* TIMER;
+	uint16_t TIM_prescaler;
+	uint32_t TIM_ARR;
+	uint8_t TIM_Counter_mode;
+	uint8_t	TIM_OnePulse_mode;
+	uint8_t TIM_Edge_trigger;
+	uint8_t TIM_INT_PRSC;
+	uint8_t TIM_FILTERING;
 }Timer_Handle_t;
+
+typedef struct{
+	uint16_t hours;
+	uint8_t minutes;
+	uint8_t seconds;
+	uint8_t ms;
+}timer_time;
 
 /*
  * Timer free run configuration function - counts to a given time and generates interrupt
@@ -50,7 +57,7 @@ uint8_t TIM_FILTERING;
  *
  *  optional:
  *  - TIMER_handler->TIM_OnePulse_mode
- *  TODO: Rest of the settings will be added
+ *  Rest of the settings will be added when needed
  *
  */
 void Timer_Init_FREE_RUN(Timer_Handle_t* TIMER_handler);
@@ -70,5 +77,11 @@ void Timer_Init_FREE_RUN(Timer_Handle_t* TIMER_handler);
  *
  */
 void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler);
+
+/*
+ * Timer printing time function
+ *
+ */
+void Timer_indicate_time(Timer_RegDef* timer);
 
 #endif /* INC_TIMER_LIB_H_ */

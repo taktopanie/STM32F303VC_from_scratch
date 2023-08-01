@@ -6,7 +6,10 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
+#include <time.h>
 #include <TIMER_lib.h>
+
 
 /*
  *
@@ -120,4 +123,28 @@ void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler){
 	// enable CC channel 1 capture enable
 	TIMER_handler->TIMER->TIMx_CCER |= (1<<0);
 
+}
+
+void Timer_indicate_time(Timer_RegDef* timer){
+
+	//CLEAN the interrupt FLAG
+	timer->TIMx_SR &= ~(0x2);
+
+	static int var_old = 0;
+	volatile long int var_curr = timer->TIMx_CR1;
+
+	var_curr = timer->TIMx_CCR1;
+
+	if(var_curr != var_old){
+		long int MS_seconds = ((var_curr-var_old)/10);
+
+		timer_time diff_time;
+		diff_time.hours = (MS_seconds/100/3600);
+		diff_time.minutes = ((MS_seconds)/100/60)%60;
+		diff_time.seconds = ((MS_seconds)/100)%60;
+		diff_time.ms= MS_seconds%100;
+
+		printf("Time diff: %02d:%02d:%02d:%02d\n", diff_time.hours, diff_time.minutes, diff_time.seconds, diff_time.ms);
+		var_old = var_curr;
+	}
 }

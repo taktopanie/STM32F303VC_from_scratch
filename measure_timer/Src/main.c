@@ -27,13 +27,6 @@
 #include<MY_interrupt.h>
 
 
-typedef struct timer_time{
-			uint16_t hours;
-			uint8_t minutes;
-			uint8_t seconds;
-			uint8_t ms;
-		}timer_time;
-
 void GPIOInits(void){
 	GPIO_Handle_t GPIOPins;
 
@@ -121,28 +114,7 @@ int main (void){
 
 void TIM2_IRQHandler(){
 
-	Timer_Handle_t timer_2;
-	timer_2.TIMER = TIMER2;
-	//CLEAN the interrupt FLAG
-	timer_2.TIMER->TIMx_SR &= ~(0x2);
-
-	static int var_old = 0;
-	volatile long int var_curr = timer_2.TIMER->TIMx_CR1;
-
-	var_curr = timer_2.TIMER->TIMx_CCR1;
-
-	if(var_curr != var_old){
-		long int MS_seconds = ((var_curr-var_old)/10);
-
-		timer_time diff_time;
-		diff_time.hours = (MS_seconds/100/3600);
-		diff_time.minutes = ((MS_seconds)/100/60)%60;
-		diff_time.seconds = ((MS_seconds)/100)%60;
-		diff_time.ms= MS_seconds%100;
-
-		printf("Time diff: %02d:%02d:%02d:%02d\n", diff_time.hours, diff_time.minutes, diff_time.seconds, diff_time.ms);
-		var_old = var_curr;
-	}
+	Timer_indicate_time(TIMER2);
 
 }
 
