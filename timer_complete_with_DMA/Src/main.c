@@ -24,7 +24,11 @@
 #include<TIMER_lib.h>
 #include<MY_interrupt.h>
 
+#include<DMA_lib.h>
 
+#define concatenation(x, y) x ## y
+
+uint32_t zmienna;
 
 void GPIOInits(void){
 	GPIO_Handle_t GPIOPins;
@@ -73,10 +77,11 @@ int main (void){
 	PeriClockControl(GPIOE, CLOCK_ENABLE);
 	PeriClockControl(GPIOA, CLOCK_ENABLE);
 
+
 	GPIOInits();
 
 	Timer_Handle_t timer_2;
-
+	DMA_Handle_t DMA_st;
 
 	////TIMER2////
 	timer_2.TIM_ARR = 0xFFFFFFFFUL;
@@ -91,6 +96,33 @@ int main (void){
 	Timer_Init_INPUT_CC_MODE(&timer_2);
 	TIMER_interrupt_set(timer_2.TIMER);
 
+	//TODO:PUT DMA CLOCK ON TO PeriClockControl function
+	//turn on DMA1 clock
+	RCC_RegDef_t* RR = (RCC_RegDef_t*) RRC_OFFSET;
+	RR->AHBENR |= (1<<0);
+
+	//TODO:PUT DMA IRQ ON TO interrupt_set function -- switch function
+	//turn on DMA IRQ
+	uint32_t * wsk;
+	wsk = (uint32_t*)(NVIC_VECT_0);
+	*wsk |= (1<<15);
+
+	uint32_t zmienna = 0;
+	DMA_st.DMA_NUMBER = DMA_NUM_1;
+	DMA_st.CHANNEL_NUMBER = 5;
+	DMA_st.SOURCE_ADDRESS = TIM_2_BASEADDR;
+	DMA_st.DESTINATION_ADDRESS = (uint32_t)&zmienna;
+	DMA_st.NUMBER_OF_DATA_TRANSFER = 1;
+	DMA_st.PRIORITY = DMA_PRIORITY_HIGH;
+	DMA_st.M2M_MODE = 0;
+	DMA_st.MEM_SIZE = DMA_MEM_SIZE_32_BIT;
+	DMA_st.PERI_SIZE = DMA_MEM_SIZE_32_BIT;
+	DMA_st.MEMORY_INCREMENT_MODE = 0;
+	DMA_st.PERIPH_INCREMENT_MODE = 0;
+	DMA_st.CIRCULAR_MODE = 1;
+	DMA_st.DATA_TRANSFER_DIRECTION = DMA_READ_FROM_PERIPH;
+
+	DMA_Init(&DMA_st);
 
 
 	while(1){
@@ -98,6 +130,16 @@ int main (void){
 	return 0;
 }
 
+void DMA1_CH5_IRQHandler(){
+	printf("HELLO FROM DMA1 CH5\n");
+
+	//TODO Function clearing flags
+	//CLEAR FLAGS
+	DMA_RegDef_t* DMA_handler = (DMA_RegDef_t*)0x40020000;
+	DMA_handler->DMA_IFCR |= (7<<16);
+}
+
 void TIM2_IRQHandler(){
 	Timer_indicate_time(TIMER2);
+
 }

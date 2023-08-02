@@ -113,7 +113,9 @@ void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler){
 
 	// enable CC channel 1 capture enable
 	TIMER_handler->TIMER->TIMx_CCER |= (1<<0);
-
+///////////////////////////////////////////////////////////////TESTTESTESTES
+	//TEST DMA CC1
+	TIMER_handler->TIMER->TIMx_DIER |= (1<<9);
 	// differentiate INPUT CHANNELS == maybe in the future
 }
 
