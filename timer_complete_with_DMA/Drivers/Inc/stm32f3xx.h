@@ -353,4 +353,16 @@ __vo uint32_t SPIx_I2SPR;
 #define	 DMA_1 ((DMA_RegDef_t*)DMA_1_BASEADDR)
 #define	 DMA_2 ((DMA_RegDef_t*)DMA_2_BASEADDR)
 
+
+#define DMA_NUM_1					1
+#define DMA_NUM_2					2
+
+#define DMA_CHANNEL_1				1
+#define DMA_CHANNEL_2				2
+#define DMA_CHANNEL_3				3
+#define DMA_CHANNEL_4				4
+#define DMA_CHANNEL_5				5
+#define DMA_CHANNEL_6				6
+#define DMA_CHANNEL_7				7
+
 #endif /* STM32F3XX_H_ */

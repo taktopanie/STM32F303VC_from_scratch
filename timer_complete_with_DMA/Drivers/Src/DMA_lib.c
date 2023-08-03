@@ -6,8 +6,25 @@
  */
 
 #include<DMA_lib.h>
+#include<stm32f3xx.h>
 
-#define concatinate(x, y) x##y
+void DMAClockControl(uint8_t DMA_Number ,uint8_t En){
+
+	if(DMA_Number == DMA_NUM_1){
+		if(En == 1){
+			RCC->AHBENR |= (1<<0);
+		}else{
+			RCC->AHBENR &= ~(1<<0);
+		}
+	}else if (DMA_Number == DMA_NUM_2){
+		if(En == 1){
+			RCC->AHBENR |= (1<<1);
+		}else{
+			RCC->AHBENR &= ~(1<<1);
+		}
+	}
+}
+
 
 void DMA_Init(DMA_Handle_t* DMA_Handler){
 

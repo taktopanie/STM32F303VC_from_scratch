@@ -26,8 +26,6 @@
 
 #include<DMA_lib.h>
 
-#define concatenation(x, y) x ## y
-
 uint32_t zmienna;
 
 void GPIOInits(void){
@@ -96,18 +94,12 @@ int main (void){
 	Timer_Init_INPUT_CC_MODE(&timer_2);
 	TIMER_interrupt_set(timer_2.TIMER);
 
-	//TODO:PUT DMA CLOCK ON TO PeriClockControl function
-	//turn on DMA1 clock
-	RCC_RegDef_t* RR = (RCC_RegDef_t*) RRC_OFFSET;
-	RR->AHBENR |= (1<<0);
+	//turn on DMA clock
+	DMAClockControl(DMA_NUM_1, CLOCK_ENABLE);
 
-	//TODO:PUT DMA IRQ ON TO interrupt_set function -- switch function
-	//turn on DMA IRQ
-	uint32_t * wsk;
-	wsk = (uint32_t*)(NVIC_VECT_0);
-	*wsk |= (1<<15);
-
+	//bufor danych
 	uint32_t zmienna = 0;
+
 	DMA_st.DMA_NUMBER = DMA_NUM_1;
 	DMA_st.CHANNEL_NUMBER = 5;
 	DMA_st.SOURCE_ADDRESS = TIM_2_BASEADDR;
@@ -121,6 +113,9 @@ int main (void){
 	DMA_st.PERIPH_INCREMENT_MODE = 0;
 	DMA_st.CIRCULAR_MODE = 1;
 	DMA_st.DATA_TRANSFER_DIRECTION = DMA_READ_FROM_PERIPH;
+
+	//set the DMA intererupt
+	DMA_interrupt_set(DMA_NUM_1, DMA_CHANNEL_5);
 
 	DMA_Init(&DMA_st);
 

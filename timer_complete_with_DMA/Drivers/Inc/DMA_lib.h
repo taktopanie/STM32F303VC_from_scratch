@@ -27,12 +27,6 @@ typedef struct{
 }DMA_Handle_t;
 
 /*
- * DMA_NUMBERS
- */
-#define DMA_NUM_1						1
-#define DMA_NUM_2						2
-
-/*
  * DMA_PRIORITIES
  */
 #define DMA_PRIORITY_LOW				0
@@ -52,6 +46,8 @@ typedef struct{
  */
 #define DMA_READ_FROM_PERIPH			0
 #define DMA_READ_FROM_MEM				1
+
+void DMAClockControl(uint8_t DMA_Number ,uint8_t En);
 
 
 /*
