@@ -61,6 +61,8 @@ typedef struct{
 	uint8_t ms;
 }timer_time;
 
+void __Timer_update_reg(Timer_RegDef* timer);
+
 /*
  * Timer free run configuration function - counts to a given time and generates interrupt
  *  @parameters which should be passed throught TIMER_handler:

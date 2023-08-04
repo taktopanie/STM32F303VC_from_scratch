@@ -216,6 +216,8 @@ void Timer_IRQ_handling(Timer_RegDef* TIMER_pointer){
 
 }
 
+
+
 void Timer_indicate_time(Timer_RegDef* timer){
 
 	//CLEAN the interrupt FLAG

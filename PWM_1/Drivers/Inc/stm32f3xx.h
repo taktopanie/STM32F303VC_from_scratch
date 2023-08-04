@@ -66,6 +66,12 @@ void systick (int time_ms);
 #define SPI_2_BASEADDR				0x40003800UL
 #define SPI_3_BASEADDR				0x40003C00UL
 
+#define TIM_2_BASEADDR				0x40000000UL
+#define TIM_3_BASEADDR				0x40000400UL
+#define TIM_4_BASEADDR				0x40000800UL
+
+#define DMA_1_BASEADDR				0x40020000UL
+#define DMA_2_BASEADDR				0x40020400UL
 
 /*
  * Registers typedef
@@ -161,6 +167,45 @@ typedef struct{
 	__vo uint32_t TIMx_DCR;
 	__vo uint32_t TIMx_DMAR;
 }Timer_RegDef;
+
+typedef struct {
+	__vo uint32_t DMA_ISR;
+	__vo uint32_t DMA_IFCR;
+	__vo uint32_t DMA_CCR1;
+	__vo uint32_t DMA_CNDTR1;
+	__vo uint32_t DMA_CPAR1;
+	__vo uint32_t DMA_CMAR1;
+	__vo uint32_t RESERVED_1;
+	__vo uint32_t DMA_CCR2;
+	__vo uint32_t DMA_CNDTR2;
+	__vo uint32_t DMA_CPAR2;
+	__vo uint32_t DMA_CMAR2;
+	__vo uint32_t RESERVED_2;
+	__vo uint32_t DMA_CCR3;
+	__vo uint32_t DMA_CNDTR3;
+	__vo uint32_t DMA_CPAR3;
+	__vo uint32_t DMA_CMAR3;
+	__vo uint32_t RESERVED_3;
+	__vo uint32_t DMA_CCR4;
+	__vo uint32_t DMA_CNDTR4;
+	__vo uint32_t DMA_CPAR4;
+	__vo uint32_t DMA_CMAR4;
+	__vo uint32_t RESERVED_4;
+	__vo uint32_t DMA_CCR5;
+	__vo uint32_t DMA_CNDTR5;
+	__vo uint32_t DMA_CPAR5;
+	__vo uint32_t DMA_CMAR5;
+	__vo uint32_t RESERVED_5;
+	__vo uint32_t DMA_CCR6;
+	__vo uint32_t DMA_CNDTR6;
+	__vo uint32_t DMA_CPAR6;
+	__vo uint32_t DMA_CMAR6;
+	__vo uint32_t RESERVED_6;
+	__vo uint32_t DMA_CCR7;
+	__vo uint32_t DMA_CNDTR7;
+	__vo uint32_t DMA_CPAR7;
+	__vo uint32_t DMA_CMAR7;
+}DMA_RegDef_t;
 
 /*
  * Peripheral definitions
@@ -301,8 +346,23 @@ __vo uint32_t SPIx_I2SPR;
 #define FLAG_RESET					0
 
 //TIMERS
-#define  TIMER2	((Timer_RegDef*)0x40000000UL)
-#define  TIMER3	((Timer_RegDef*)0x40000400UL)
-#define  TIMER4	((Timer_RegDef*)0x40000800UL)
+#define  TIMER2	((Timer_RegDef*)TIM_2_BASEADDR)
+#define  TIMER3	((Timer_RegDef*)TIM_3_BASEADDR)
+#define  TIMER4	((Timer_RegDef*)TIM_4_BASEADDR)
+
+#define	 DMA_1 ((DMA_RegDef_t*)DMA_1_BASEADDR)
+#define	 DMA_2 ((DMA_RegDef_t*)DMA_2_BASEADDR)
+
+
+#define DMA_NUM_1					1
+#define DMA_NUM_2					2
+
+#define DMA_CHANNEL_1				1
+#define DMA_CHANNEL_2				2
+#define DMA_CHANNEL_3				3
+#define DMA_CHANNEL_4				4
+#define DMA_CHANNEL_5				5
+#define DMA_CHANNEL_6				6
+#define DMA_CHANNEL_7				7
 
 #endif /* STM32F3XX_H_ */

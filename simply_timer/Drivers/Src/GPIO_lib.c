@@ -300,14 +300,7 @@ void GPIO_IRQHandling(uint8_t PinNumber){
 		//clear
 		EXTI->PR1 |= (1 << PinNumber);
 		//FUNCTION BODY
-		GPIO_TogglePin(GPIOE, GPIO_PIN_15);
-		GPIO_TogglePin(GPIOE, GPIO_PIN_14);
-		GPIO_TogglePin(GPIOE, GPIO_PIN_13);
-		GPIO_TogglePin(GPIOE, GPIO_PIN_12);
-		GPIO_TogglePin(GPIOE, GPIO_PIN_11);
-		GPIO_TogglePin(GPIOE, GPIO_PIN_10);
-		GPIO_TogglePin(GPIOE, GPIO_PIN_9);
-		GPIO_TogglePin(GPIOE, GPIO_PIN_8);
+		//GPIO_TogglePin(GPIOE, GPIO_PIN_15);
 
 	}
 

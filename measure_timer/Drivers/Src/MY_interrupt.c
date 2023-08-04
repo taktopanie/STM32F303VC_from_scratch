@@ -41,3 +41,68 @@ void GPIO_interrupt_set(void){
 	//?????????????????????????????????????????????
 
 }
+
+void DMA_interrupt_set(uint8_t DMA_number, uint8_t DMA_channel){
+
+	uint32_t * wsk;
+
+
+
+	if(DMA_number == DMA_NUM_1){
+
+		wsk = (uint32_t*)(NVIC_VECT_0);
+
+		switch(DMA_channel){
+			case 1:
+				*wsk |= (1<<11);
+				break;
+			case 2:
+				*wsk |= (1<<12);
+				break;
+			case 3:
+				*wsk |= (1<<13);
+				break;
+			case 4:
+				*wsk |= (1<<14);
+				break;
+			case 5:
+				*wsk |= (1<<15);
+				break;
+			case 6:
+				*wsk |= (1<<16);
+				break;
+			case 7:
+				*wsk |= (1<<17);
+				break;
+
+		}
+	}else if (DMA_number == DMA_NUM_2){
+
+		wsk = (uint32_t*)(NVIC_VECT_1);
+
+		switch(DMA_channel){
+			case 1:
+				*wsk |= (1<<24);
+				break;
+			case 2:
+				*wsk |= (1<<25);
+				break;
+			case 3:
+				*wsk |= (1<<26);
+				break;
+			case 4:
+				*wsk |= (1<<27);
+				break;
+			case 5:
+				*wsk |= (1<<28);
+				break;
+			case 6:
+				*wsk |= (1<<29);
+				break;
+			case 7:
+				*wsk |= (1<<30);
+				break;
+
+		}
+	}
+}

@@ -10,10 +10,6 @@
 
 #include<stm32f3xx.h>
 
-/*
- * user define
- */
-
 
 /*
  * GPIO Pin configuration structure
@@ -64,9 +60,9 @@ typedef struct{
 #define GPIO_MODE_OUTPUT				1
 #define GPIO_MODE_ALTERNATE				2
 #define GPIO_MODE_ANALOG				3
-#define GPIO_MODE_IT_FT				4
-#define GPIO_MODE_IT_RT				5
-#define GPIO_MODE_IT_FRT			6
+#define GPIO_MODE_IT_FT					4
+#define GPIO_MODE_IT_RT					5
+#define GPIO_MODE_IT_FRT				6
 
 /*
  * @GPIO_OUT_TYPES

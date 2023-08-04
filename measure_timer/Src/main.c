@@ -86,9 +86,9 @@ int main (void){
 	//MAX arr value
 	timer_2.TIM_ARR = 0xFFFFFFFFUL;
 	//8 000 000 / 8000 = 1000 =>  0.1ms precision
-	timer_2.TIM_prescaler = (8000-1);
-	timer_2.TIM_Counter_mode = COUNTER_MODE_UP;
-	timer_2.TIM_Edge_trigger = TIM_EDGE_RISING;
+	timer_2.TIM_PRESCALLER = (8000-1);
+	timer_2.TIM_COUNTER_mode = COUNTER_MODE_UP;
+	timer_2.TIM_EDGE_TRIGGER = TIM_EDGE_RISING;
 	timer_2.TIM_INT_PRSC = TIM_INTERRUPT_1_EVENT;
 	timer_2.TIM_FILTERING = TIM_FILTERING_NO;
 	Timer_Init_INPUT_CC_MODE(&timer_2);
@@ -98,8 +98,8 @@ int main (void){
 /////TIMER3////
 	timer_3.TIMER = TIMER3;
 	timer_3.TIM_ARR = (1000-1);
-	timer_3.TIM_prescaler = (800-1);
-	timer_3.TIM_Counter_mode= COUNTER_MODE_DOWN;
+	timer_3.TIM_PRESCALLER = (800-1);
+	timer_3.TIM_COUNTER_mode= COUNTER_MODE_DOWN;
 
 	Timer_Init_FREE_RUN(&timer_3);
 	TIMER_interrupt_set(timer_3.TIMER);

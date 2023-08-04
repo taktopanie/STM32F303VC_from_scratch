@@ -128,10 +128,9 @@ int main (void){
 void DMA1_CH5_IRQHandler(){
 	printf("HELLO FROM DMA1 CH5\n");
 
-	//TODO Function clearing flags
 	//CLEAR FLAGS
-	DMA_RegDef_t* DMA_handler = (DMA_RegDef_t*)0x40020000;
-	DMA_handler->DMA_IFCR |= (7<<16);
+	DMA_RegDef_t* DMA_handler = (DMA_RegDef_t*)DMA_1_BASEADDR;
+	DMA_IRQ_handling(DMA_handler);
 }
 
 void TIM2_IRQHandler(){

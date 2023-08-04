@@ -10,7 +10,6 @@
 #include <time.h>
 #include <TIMER_lib.h>
 
-
 /*
  *
  */
@@ -32,7 +31,7 @@ void __Timer_update_reg(Timer_RegDef* timer){
 	timer->TIMx_EGR |= (1<<0);
 	//wait while UG flag set
 	while(!(timer->TIMx_SR & (1<<0)));
-	//cleare the flags
+	//clear the flags
 	timer->TIMx_SR &= ~(0x1F<<0);
 
 	//wait till flag set
@@ -41,24 +40,23 @@ void __Timer_update_reg(Timer_RegDef* timer){
 
 /*
 *
-*
-*
+* free_run function
 */
 void Timer_Init_FREE_RUN(Timer_Handle_t* TIMER_handler){
 
 	__Timer_Clock_update(TIMER_handler->TIMER);
 
-	//set counte mode
-	TIMER_handler->TIMER->TIMx_CR1 |= (TIMER_handler->TIM_Counter_mode << 4);
+	//set counter mode
+	TIMER_handler->TIMER->TIMx_CR1 |= (TIMER_handler->TIM_COUNTER_mode << 4);
 
 	//set ARR and PRESCALER
 	TIMER_handler->TIMER->TIMx_ARR = TIMER_handler->TIM_ARR;
-	TIMER_handler->TIMER->TIMx_PSC |= TIMER_handler->TIM_prescaler;
+	TIMER_handler->TIMER->TIMx_PSC |= TIMER_handler->TIM_PRESCALLER;
 
 	//update shadow values
 	__Timer_update_reg(TIMER_handler->TIMER);
 
-	if(TIMER_handler->TIM_OnePulse_mode != 0){
+	if(TIMER_handler->TIM_ONEPULSE != 0){
 		TIMER_handler->TIMER->TIMx_CR1 |= (1 << 3);
 	}
 
@@ -75,44 +73,37 @@ void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler){
 	__Timer_Clock_update(TIMER_handler->TIMER);
 
 	//counter mode
-	TIMER_handler->TIMER->TIMx_CR1 |= (TIMER_handler->TIM_Counter_mode << 4);
+	TIMER_handler->TIMER->TIMx_CR1 |= (TIMER_handler->TIM_COUNTER_mode << 4);
 
 	//TRIGGER EDGE
-	if(TIMER_handler->TIM_Edge_trigger == TIM_EDGE_RISING){
+	if(TIMER_handler->TIM_EDGE_TRIGGER == TIM_EDGE_RISING){
 		TIMER_handler->TIMER->TIMx_CCER &= ~(5 << 1);
-	}else if(TIMER_handler->TIM_Edge_trigger == TIM_EDGE_FALLING){
+	}else if(TIMER_handler->TIM_EDGE_TRIGGER == TIM_EDGE_FALLING){
 		TIMER_handler->TIMER->TIMx_CCER &= ~(5 << 1);
 		TIMER_handler->TIMER->TIMx_CCER |= (1 << 1);
-	}else if(TIMER_handler->TIM_Edge_trigger == TIM_EDGE_BOTH){
+	}else if(TIMER_handler->TIM_EDGE_TRIGGER == TIM_EDGE_BOTH){
 		TIMER_handler->TIMER->TIMx_CCER &= ~(5 << 1);
 		TIMER_handler->TIMER->TIMx_CCER |= (5 << 1);
 	}
 
-
 	//FILTERING (noise reduction)
 	TIMER_handler->TIMER->TIMx_CCMR1 |= (TIMER_handler->TIM_FILTERING<<4);
 
-	//TI2 FILTERING
-	//TIMER_handler->TIMER->TIMx_CCMR1 |= (TIMER_handler->TIM_FILTERING<<12);
-
 	//INPUT PRESCALLER - CAPTURE MADE EVERY x EVENTS
+	TIMER_handler->TIMER->TIMx_CCMR1 &= ~(3<<2);
 	TIMER_handler->TIMER->TIMx_CCMR1 |= (TIMER_handler->TIM_INT_PRSC<<2);
 
-	//TI1 input
+	//TI1 input selection
 	TIMER_handler->TIMER->TIMx_CCMR1 |= (1<<0);
-	// TI2 INPUT
-	//TIMER_handler->TIMER->TIMx_CCMR1 |= (1<<1);
 
 	//set prescaler
-	TIMER_handler->TIMER->TIMx_PSC = TIMER_handler->TIM_prescaler;
+	TIMER_handler->TIMER->TIMx_PSC = TIMER_handler->TIM_PRESCALLER;
 
-	//ARR max value
+	//set TIMER ARR
 	TIMER_handler->TIMER->TIMx_ARR = TIMER_handler->TIM_ARR;
 
-	__Timer_update_reg(TIMER_handler->TIMER);
 
-	//allow to generate update
-	//TIMER_handler->TIMER->TIMx_DIER |= (1<<0);
+	__Timer_update_reg(TIMER_handler->TIMER);
 
 	//enable CCR1 interupt
 	TIMER_handler->TIMER->TIMx_DIER |= (1<<1);
@@ -122,13 +113,115 @@ void Timer_Init_INPUT_CC_MODE(Timer_Handle_t* TIMER_handler){
 
 	// enable CC channel 1 capture enable
 	TIMER_handler->TIMER->TIMx_CCER |= (1<<0);
+///////////////////////////////////////////////////////////////TESTTESTESTES
+	//TEST DMA CC1
+	TIMER_handler->TIMER->TIMx_DIER |= (1<<9);
+	// differentiate INPUT CHANNELS == maybe in the future
+}
+
+void Timer_Init_PWM_MODE(Timer_Handle_t* TIMER_handler){
+	//Turn on the TIM clock
+	__Timer_Clock_update(TIMER_handler->TIMER);
+
+	//counter mode
+	TIMER_handler->TIMER->TIMx_CR1 |= (TIMER_handler->TIM_COUNTER_mode << 4);
+
+	//set prescaler to 0.1 ms precision
+	TIMER_handler->TIMER->TIMx_PSC = TIMER_handler->TIM_PRESCALLER;
+
+	//ARR value
+	TIMER_handler->TIMER->TIMx_ARR = TIMER_handler->TIM_ARR;
+
+	//OC preload enable
+	TIMER_handler->TIMER->TIMx_CCMR1 |= (1 << 11);
+
+
+	//TODO: add diferent channels - now its only ch2
+	if(TIMER_handler->TIM_PWM_INVERTED_MODE){
+		TIMER_handler->TIMER->TIMx_CCMR1 &= ~( 7 << 12 );
+		TIMER_handler->TIMER->TIMx_CCMR1 |= ( 6 << 12 );
+	}else{
+		TIMER_handler->TIMER->TIMx_CCMR1 &= ~( 7 << 12 );
+		TIMER_handler->TIMER->TIMx_CCMR1 |= ( 7 << 12 );
+	}
+
+	//PWM width percent
+	uint32_t tmp_percent = (TIMER_handler->TIMER->TIMx_ARR + 1)*(TIMER_handler->TIM_PWM_WIDTH_PERCENT)/100;
+	TIMER_handler->TIMER->TIMx_CCR2 &= ~(0xFFFFFFFF);
+	TIMER_handler->TIMER->TIMx_CCR2 |= tmp_percent;
+
+
+	__Timer_update_reg(TIMER_handler->TIMER);
+
+
+	//turn on the TIM
+	TIMER_handler->TIMER->TIMx_CR1 |= (1<<0);
+
+	// enable C/C output
+	TIMER_handler->TIMER->TIMx_CCER |= (1<<4);
+}
+
+void Timer_IRQ_handling(Timer_RegDef* TIMER_pointer){
+
+	//UIF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<0)){
+		TIMER_pointer->TIMx_SR &= ~(1<<0);
+		//body of particular irq
+	}
+
+	//OC1IF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<1)){
+		TIMER_pointer->TIMx_SR &= ~(1<<1);
+	}
+
+	//OC2IF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<2)){
+		TIMER_pointer->TIMx_SR &= ~(1<<2);
+	}
+
+	//OC3IF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<3)){
+		TIMER_pointer->TIMx_SR &= ~(1<<3);
+	}
+
+	//OC4IF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<4)){
+		TIMER_pointer->TIMx_SR &= ~(1<<4);
+	}
+
+	//TIF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<6)){
+		TIMER_pointer->TIMx_SR &= ~(1<<6);
+	}
+
+	//CC1OF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<9)){
+		TIMER_pointer->TIMx_SR &= ~(1<<9);
+	}
+
+	//CC2OF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<10)){
+		TIMER_pointer->TIMx_SR &= ~(1<<10);
+	}
+
+	//CC3OF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<11)){
+		TIMER_pointer->TIMx_SR &= ~(1<<11);
+	}
+
+	//CC4OF interrupt
+	if(TIMER_pointer->TIMx_SR & (1<<12)){
+		TIMER_pointer->TIMx_SR &= ~(1<<12);
+	}
 
 }
+
+
 
 void Timer_indicate_time(Timer_RegDef* timer){
 
 	//CLEAN the interrupt FLAG
-	timer->TIMx_SR &= ~(0x2);
+	Timer_IRQ_handling(timer);
 
 	static int var_old = 0;
 	volatile long int var_curr = timer->TIMx_CR1;
