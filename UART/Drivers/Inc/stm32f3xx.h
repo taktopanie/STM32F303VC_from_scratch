@@ -385,4 +385,7 @@ __vo uint32_t SPIx_I2SPR;
 #define DMA_CHANNEL_6				6
 #define DMA_CHANNEL_7				7
 
+#define USART1 ((USART_RegDef_t *)USART_1_BASEADDR)
+
+
 #endif /* STM32F3XX_H_ */

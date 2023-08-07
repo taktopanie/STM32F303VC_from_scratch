@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include<stm32f3xx.h>
 #include <GPIO_lib.h>
+#include <UART_lib.h>
 
 
 void UARTGPIOInit(void){
@@ -33,7 +34,8 @@ GPIO_Pins.GPIO_Regdef = GPIOA;
 
 GPIO_Pins.GPIO_config.Pin_Mode = GPIO_MODE_ALTERNATE;
 GPIO_Pins.GPIO_config.Pin_Output_Type = GPIO_PUSH_PULL;
-GPIO_Pins.GPIO_config.Pin_Pull = GPIO_PULL_DOWN;
+//PULL UP UART PINS RESOLVE IDLE FRAM ISSUE
+GPIO_Pins.GPIO_config.Pin_Pull = GPIO_PULL_UP;
 GPIO_Pins.GPIO_config.Pin_Speed = GPIO_SPEED_HIGH;
 GPIO_Pins.GPIO_config.Pin_alt_func = AF_7;
 
@@ -70,48 +72,18 @@ data transmission has started.
 previous data.
 This flag generates an interrupt if the TXEIE bit is set.
  */
-void UARTInit(void){
-	//turn on UART clock
-	RCC->APB2ENR |= (1 << 14);
 
-USART_RegDef_t *UART = (USART_RegDef_t *)USART_1_BASEADDR;
-	//1. Program the M bits in USART_CR1 to define the word length.
-	//M[1:0] = 00: 1 Start bit, 8 data bits, n stop bits
-		UART->USART_CR1 &= ~(1 << 28);
-	//2. Select the desired baud rate using the USART_BRR register.
-		// BRR = SYSCLK/BAUD = 8000000/9600 = 833 =>0x341
-		UART->USART_BRR = 0x341;
-	//3. Program the number of stop bits in USART_CR2. 1 stopbit
-		UART->USART_CR1 &= ~(3 << 12);
-	//4. Enable the USART by writing the UE bit in USART_CR1 register to 1.
-		UART->USART_CR1 |= (1<<0);
-	//6. Set the TE bit in USART_CR1 to send an idle frame as first transmission.
-		UART->USART_CR1 |= (1<<3);
-	//7. Write the data to send in the USART_TDR register (this clears the TXE bit). Repeat this
-	//	for each data to be transmitted in case of single buffer.
-		UART->USART_TDR = 'L';
-	/*
-	 * 8. After writing the last data into the USART_TDR register, wait until TC=1. This indicates
-		that the transmission of the last frame is complete. This is required for instance when
-		the USART is disabled or enters the Halt mode to avoid corrupting the last
-		transmission.
-	 */
-		while(!(UART->USART_ISR & (1 << 6)));
-		UART->USART_TDR = 'O';
-		while(!(UART->USART_ISR & (1 << 6)));
-		UART->USART_TDR = 'L';
-		while(!(UART->USART_ISR & (1 << 6)));
-		UART->USART_CR1 &= ~(1<<0);
-
-}
 
 int main(void)
 {
 
+printf("%d\n",sizeof("taktopanie")/32);
 
-	printf("HELLO WORLD\n");
-	UARTGPIOInit();
-	UARTInit();
+UARTGPIOInit();
+
+UART_PeriClockControl(ENABLE);
+UART_Init();
+UART_SendString("taktopanie", 3);
 	/* Loop forever */
 	for(;;);
 }
