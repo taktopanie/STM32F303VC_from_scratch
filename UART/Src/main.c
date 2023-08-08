@@ -77,13 +77,24 @@ This flag generates an interrupt if the TXEIE bit is set.
 int main(void)
 {
 
-printf("%d\n",sizeof("taktopanie")/32);
 
 UARTGPIOInit();
 
 UART_PeriClockControl(ENABLE);
-UART_Init();
-UART_SendString("taktopanie", 3);
+
+USART_Handle_t UART_1_handler;
+UART_1_handler.USART = USART1;
+UART_1_handler.baud = BAUD_RATE_9600;
+UART_1_handler.data_bits = DATA_BITS_7;
+UART_1_handler.stop_bits = STOP_BITS_1;
+UART_Init(&UART_1_handler);
+
+printf("sizeof char: %d\nsizeof int: %d\n", sizeof("hello"), sizeof(int));
+
+//send string with NULL value at the end(if not needed -1 from sizeof)
+UART_SendString(UART_1_handler.USART,"taktopanie", sizeof("taktopanie"));
+
+UART_SendString(UART_1_handler.USART, "TEST", sizeof("test"));
 	/* Loop forever */
 	for(;;);
 }
