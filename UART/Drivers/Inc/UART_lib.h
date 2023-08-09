@@ -25,6 +25,8 @@
 #define STOP_BITS_2						2
 #define STOP_BITS_1_5					3
 
+
+
 typedef struct{
 	USART_RegDef_t* USART;
 	uint8_t data_bits;					// see @DATABITS

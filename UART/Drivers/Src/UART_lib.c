@@ -32,14 +32,13 @@ void UART_Init(USART_Handle_t* UART){
 		UART->USART->USART_CR2 &= ~(0x3 << 12);
 		UART->USART->USART_CR2 |= (UART->stop_bits << 12);
 	//4. Enable the USART by writing the UE bit in USART_CR1 register to 1.
+		//TURN ON UART
 		UART->USART->USART_CR1 |= (1 << 0);
 	//6. Set the TE bit in USART_CR1 to send an idle frame as first transmission.
-		UART->USART->USART_CR1 |= (1 << 3);
 	//7. Write the data to send in the USART_TDR register (this clears the TXE bit). Repeat this
 		//	for each data to be transmitted in case of single buffer.
-
 	/*
-	 * 8. After writing the last data into the USART_TDR register, wait until TC=1. This indicates
+	* 8. After writing the last data into the USART_TDR register, wait until TC=1. This indicates
 		that the transmission of the last frame is complete. This is required for instance when
 		the USART is disabled or enters the Halt mode to avoid corrupting the last
 		transmission.
@@ -47,20 +46,22 @@ void UART_Init(USART_Handle_t* UART){
 }
 
 void UART_SendChar(USART_RegDef_t * UART, char* sign){
-
+	while(!(UART->USART_ISR & (1 << 7)));
 	UART->USART_TDR = *sign;
-	while(!(UART->USART_ISR & (1 << 6)));
 }
 
 void UART_SendString(USART_RegDef_t * UART,  char* sign, uint8_t number_of_chars){
 
-	if(!(UART->USART_CR1 & (1<<0))){
-		UART->USART_CR1 |= (1<<0);
-	}
+	//ENABLE TX UART
+	UART->USART_CR1 |= (1 << 3);
 
-	UART->USART_CR1 |= (1<<3);
+	UART->USART_CR1 |= (1 << 6);
+
+
 	for (int i = 0; i < number_of_chars; i++){
 		UART_SendChar(UART, sign++);
 	}
-	UART->USART_CR1 &= ~(1<<0);
+
+	//ENABLE TX UART
+	UART->USART_CR1 &= ~(1 << 3);
 }

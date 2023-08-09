@@ -22,6 +22,7 @@
 #include <GPIO_lib.h>
 #include <UART_lib.h>
 
+extern volatile uint8_t IRQ_TC_FLAG;
 
 void UARTGPIOInit(void){
 //GPIO_RegDef_t* GPIO = (GPIO_RegDef_t*)GPIOE;
@@ -47,37 +48,24 @@ GPIO_Init(&GPIO_Pins);
 
 }
 
-/*
- * Character transmission procedure
-1. Program the M bits in USART_CR1 to define the word length.
-2. Select the desired baud rate using the USART_BRR register.
-3. Program the number of stop bits in USART_CR2.
-4. Enable the USART by writing the UE bit in USART_CR1 register to 1.
-5. Select DMA enable (DMAT) in USART_CR3 if multibuffer communication is to take
-place. Configure the DMA register as explained in multibuffer communication.
-6. Set the TE bit in USART_CR1 to send an idle frame as first transmission.
-7. Write the data to send in the USART_TDR register (this clears the TXE bit). Repeat this
-for each data to be transmitted in case of single buffer.
-8. After writing the last data into the USART_TDR register, wait until TC=1. This indicates
-that the transmission of the last frame is complete. This is required for instance when
-the USART is disabled or enters the Halt mode to avoid corrupting the last
-transmission.
-Single byte communication
-Clearing the TXE bit is always performed by a write to the transmit data register.
-The TXE bit is set by hardware and it indicates:
-• The data has been moved from the USART_TDR register to the shift register and the
-data transmission has started.
-• The USART_TDR register is empty.
-• The next data can be written in the USART_TDR register without overwriting the
-previous data.
-This flag generates an interrupt if the TXEIE bit is set.
- */
+void GPIO_FOR_DEBUG(void){
+	GPIO_Handle_t GPIO_deb ;
 
+	GPIO_deb.GPIO_Regdef = GPIOA;
+
+	GPIO_deb.GPIO_config.Pin_Mode = GPIO_MODE_OUTPUT;
+	GPIO_deb.GPIO_config.Pin_Output_Type = GPIO_PUSH_PULL;
+	//PULL UP UART PINS RESOLVE IDLE FRAM ISSUE
+	GPIO_deb.GPIO_config.Pin_Pull = GPIO_PULL_DOWN;
+	GPIO_deb.GPIO_config.Pin_Speed = GPIO_SPEED_HIGH;
+	GPIO_deb.GPIO_config.Pin_Number = GPIO_PIN_8;
+	GPIO_Init(&GPIO_deb);
+}
 
 int main(void)
 {
 
-
+GPIO_FOR_DEBUG();
 UARTGPIOInit();
 
 UART_PeriClockControl(ENABLE);
@@ -89,12 +77,26 @@ UART_1_handler.data_bits = DATA_BITS_7;
 UART_1_handler.stop_bits = STOP_BITS_1;
 UART_Init(&UART_1_handler);
 
-printf("sizeof char: %d\nsizeof int: %d\n", sizeof("hello"), sizeof(int));
+//Transmission complete interrupt enable
 
+//
+*NVIC_ISER1 |= (1 << 5);
+
+printf("Hello FROM MAIN\n");
 //send string with NULL value at the end(if not needed -1 from sizeof)
 UART_SendString(UART_1_handler.USART,"taktopanie", sizeof("taktopanie"));
 
-UART_SendString(UART_1_handler.USART, "TEST", sizeof("test"));
+
 	/* Loop forever */
 	for(;;);
+
+}
+
+void USART1_EXTI25_IRQHandler(){
+
+	//clear the TC IRQ flag
+	USART1->USART_ICR |= (1 << 6);
+	GPIO_TogglePin(GPIOA, GPIO_PIN_8);
+
+
 }
