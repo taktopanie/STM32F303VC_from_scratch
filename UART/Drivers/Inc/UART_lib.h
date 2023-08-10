@@ -40,6 +40,8 @@ void UART_PeriClockControl(uint8_t Clock_State);
 void UART_Init(USART_Handle_t* UART);
 
 void UART_SendChar(USART_RegDef_t * UART, char* sign);
+void UART_ReceiveChar(USART_RegDef_t * UART);
+
 void UART_SendString(USART_RegDef_t * UART,  char* sign, uint8_t number_of_chars);
 
 #endif /* UART_LIB_H_ */

@@ -84,8 +84,7 @@ UART_Init(&UART_1_handler);
 
 printf("Hello FROM MAIN\n");
 //send string with NULL value at the end(if not needed -1 from sizeof)
-UART_SendString(UART_1_handler.USART,"taktopanie", sizeof("taktopanie"));
-
+UART_SendString(UART_1_handler.USART,"taktopanie\r\n", sizeof("taktopanie\n"));
 
 	/* Loop forever */
 	for(;;);
@@ -94,9 +93,21 @@ UART_SendString(UART_1_handler.USART,"taktopanie", sizeof("taktopanie"));
 
 void USART1_EXTI25_IRQHandler(){
 
-	//clear the TC IRQ flag
-	USART1->USART_ICR |= (1 << 6);
-	GPIO_TogglePin(GPIOA, GPIO_PIN_8);
+	// TRANSMIT COMPLETE IRQ
+	if(USART1->USART_ISR & (1 << 6)){
+		//clear the TC IRQ flag
+		USART1->USART_ICR |= (1 << 6);
+		GPIO_TogglePin(GPIOA, GPIO_PIN_8);
+	}
+
+	// READ DATA REGISTER NOT EMPTY IRQ
+	if(USART1->USART_ISR & (1 << 5)){
+		//clear the TC IRQ flag
+		USART1->USART_ICR |= (1 << 5);
+		UART_ReceiveChar(USART1);
+		GPIO_TogglePin(GPIOA, GPIO_PIN_8);
+
+	}
 
 
 }
