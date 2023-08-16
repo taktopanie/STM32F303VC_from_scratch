@@ -62,29 +62,30 @@ void GPIO_FOR_DEBUG(void){
 	GPIO_Init(&GPIO_deb);
 }
 
+void UARTInit(USART_Handle_t* UART_1_handler){
+	UART_PeriClockControl(ENABLE);
+
+
+	UART_1_handler->USART = USART1;
+	UART_1_handler->baud = BAUD_RATE_9600;
+	UART_1_handler->data_bits = DATA_BITS_7;
+	UART_1_handler->stop_bits = STOP_BITS_1;
+	UART_Init(UART_1_handler);
+}
+
 int main(void)
 {
+	USART_Handle_t UART_1_handler;
 
-GPIO_FOR_DEBUG();
-UARTGPIOInit();
+	GPIO_FOR_DEBUG();
+	UARTGPIOInit();
 
-UART_PeriClockControl(ENABLE);
+	UARTInit(&UART_1_handler);
 
-USART_Handle_t UART_1_handler;
-UART_1_handler.USART = USART1;
-UART_1_handler.baud = BAUD_RATE_9600;
-UART_1_handler.data_bits = DATA_BITS_7;
-UART_1_handler.stop_bits = STOP_BITS_1;
-UART_Init(&UART_1_handler);
+	printf("Hello FROM MAIN\n");
 
-//Transmission complete interrupt enable
-
-//
-*NVIC_ISER1 |= (1 << 5);
-
-printf("Hello FROM MAIN\n");
-//send string with NULL value at the end(if not needed -1 from sizeof)
-UART_SendString(UART_1_handler.USART,"taktopanie\r\n", sizeof("taktopanie\n"));
+	//send string with NULL value at the end(if not needed -1 from sizeof)
+	UART_SendString(UART_1_handler.USART,"taktopanie\r\n", sizeof("taktopanie\n"));
 
 	/* Loop forever */
 	for(;;);

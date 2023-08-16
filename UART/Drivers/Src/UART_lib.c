@@ -44,6 +44,9 @@ void UART_Init(USART_Handle_t* UART){
 		//ENABLE THE UART RECEIVER
 		UART->USART->USART_CR1 |= (1 << 2);
 
+		//Transmission complete interrupt enable
+		*NVIC_ISER1 |= (1 << 5);
+
 }
 
 void UART_SendChar(USART_RegDef_t * UART, char* sign){
@@ -81,4 +84,25 @@ void UART_SendString(USART_RegDef_t * UART,  char* sign, uint8_t number_of_chars
 
 	//ENABLE TX UART
 	UART->USART_CR1 &= ~(1 << 3);
+}
+
+/*
+ * 1. Write the USART_TDR register address in the DMA control register to configure it as
+the destination of the transfer. The data is moved to this address from memory after
+each TXE event.
+2. Write the memory address in the DMA control register to configure it as the source of
+the transfer. The data is loaded into the USART_TDR register from this memory area
+after each TXE event.
+3. Configure the total number of bytes to be transferred to the DMA control register.
+4. Configure the channel priority in the DMA register
+5. Configure DMA interrupt generation after half/ full transfer as required by the
+application.
+6. Clear the TC flag in the USART_ISR register by setting the TCCF bit in the
+USART_ICR register.
+7. Activate the channel in the DMA register
+ */
+
+//TODO: same function for all UART's
+void UART1_DMA_WRITE(char* buffor, uint8_t number_of_chars){
+//UART1 DMA1 / CHANNEL4
 }
