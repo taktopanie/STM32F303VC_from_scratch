@@ -21,8 +21,11 @@
 #include<stm32f3xx.h>
 #include <GPIO_lib.h>
 #include <UART_lib.h>
+#include <DMA_lib.h>
 
-extern volatile uint8_t IRQ_TC_FLAG;
+#define MSG_SIZE 14
+
+char msg[MSG_SIZE] = "HELLO BY DMA\r\n";
 
 void UARTGPIOInit(void){
 //GPIO_RegDef_t* GPIO = (GPIO_RegDef_t*)GPIOE;
@@ -64,8 +67,6 @@ void GPIO_FOR_DEBUG(void){
 
 void UARTInit(USART_Handle_t* UART_1_handler){
 	UART_PeriClockControl(ENABLE);
-
-
 	UART_1_handler->USART = USART1;
 	UART_1_handler->baud = BAUD_RATE_9600;
 	UART_1_handler->data_bits = DATA_BITS_7;
@@ -73,22 +74,61 @@ void UARTInit(USART_Handle_t* UART_1_handler){
 	UART_Init(UART_1_handler);
 }
 
+void UARTDMAInit(DMA_Handle_t * DMA_UART){
+	DMAClockControl(DMA_NUM_1, CLOCK_ENABLE);
+	DMA_UART->DMA_NUMBER = DMA_NUM_1;
+	DMA_UART->CHANNEL_NUMBER = DMA_CHANNEL_4;
+	DMA_UART->SOURCE_ADDRESS = 0x40013828UL;
+	DMA_UART->DESTINATION_ADDRESS = (uint32_t)msg;
+	DMA_UART->NUMBER_OF_DATA_TRANSFER = MSG_SIZE;
+	DMA_UART->PRIORITY = DMA_PRIORITY_MEDIUM;
+	DMA_UART->M2M_MODE = 0;
+	DMA_UART->PERI_SIZE = DMA_MEM_SIZE_32_BIT;
+	DMA_UART->MEM_SIZE = DMA_MEM_SIZE_8_BIT;
+	DMA_UART->MEMORY_INCREMENT_MODE = 1;
+	DMA_UART->PERIPH_INCREMENT_MODE = 0;
+	DMA_UART->CIRCULAR_MODE = 0;
+	DMA_UART->DATA_TRANSFER_DIRECTION = DMA_READ_FROM_MEM;
+	DMA_Init(DMA_UART);
+}
+
+void UART1_DMA_RELOAD(){
+	//TURN OFF DMA CHANNEL4
+	DMA_1->DMA_CCR4 &= ~(1 << 0);
+	//RELOAD THE COUNTER
+	DMA_1->DMA_CNDTR4 = MSG_SIZE;
+	//TURN ON DMA CHANNEL4
+	DMA_1->DMA_CCR4 |= (1 << 0);
+}
+
+
 int main(void)
 {
 	USART_Handle_t UART_1_handler;
+	DMA_Handle_t DMA_UART1;
 
 	GPIO_FOR_DEBUG();
 	UARTGPIOInit();
 
 	UARTInit(&UART_1_handler);
+	UARTDMAInit(&DMA_UART1);
+
+	//TURN ON DMA UART
+	UART_1_handler.USART->USART_CR3 |= (1 << 7);
+
+	//wait until DMA sent the message -- TC NOT SET /// WASTE OF TIME only for testing purpose
+	while(!(USART1->USART_ISR & (1 << 6)));
 
 	printf("Hello FROM MAIN\n");
 
 	//send string with NULL value at the end(if not needed -1 from sizeof)
 	UART_SendString(UART_1_handler.USART,"taktopanie\r\n", sizeof("taktopanie\n"));
-
+	UART_SendString(UART_1_handler.USART,"END..\n\r\n", sizeof("END..\n\r\n"));
 	/* Loop forever */
-	for(;;);
+	for(;;){
+
+
+	}
 
 }
 
@@ -100,6 +140,11 @@ void USART1_EXTI25_IRQHandler(){
 		USART1->USART_ICR |= (1 << 6);
 		GPIO_TogglePin(GPIOA, GPIO_PIN_8);
 	}
+	//DMA CHANNEL4_GLOBAL_FLAG_CLEAR
+	if (DMA_1->DMA_ISR & (1 << 12)){
+		DMA_1->DMA_IFCR |= (1 << 12);
+	}
+
 
 	// READ DATA REGISTER NOT EMPTY IRQ
 	if(USART1->USART_ISR & (1 << 5)){
