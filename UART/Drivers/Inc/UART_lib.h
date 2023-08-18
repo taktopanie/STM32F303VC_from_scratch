@@ -44,6 +44,6 @@ void UART_ReceiveChar(USART_RegDef_t * UART);
 
 void UART_SendString(USART_RegDef_t * UART,  char* sign, uint8_t number_of_chars);
 
-void UART1_DMA_WRITE(char* buffor, uint8_t number_of_chars);
+void UART1_DMA_WRITE(void);
 
 #endif /* UART_LIB_H_ */
