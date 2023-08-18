@@ -26,27 +26,6 @@ typedef struct{
 	uint8_t DATA_TRANSFER_DIRECTION;
 }DMA_Handle_t;
 
-/*
- * DMA_PRIORITIES
- */
-#define DMA_PRIORITY_LOW				0
-#define DMA_PRIORITY_MEDIUM				1
-#define DMA_PRIORITY_HIGH				2
-#define DMA_PRIORITY_VERY_HIGH			3
-
-/*
- * DMA_MEM_SIZE
- */
-#define DMA_MEM_SIZE_8_BIT				0
-#define DMA_MEM_SIZE_16_BIT				1
-#define DMA_MEM_SIZE_32_BIT				2
-
-/*
- * DMA_DIRECTIONS
- */
-#define DMA_READ_FROM_PERIPH			0
-#define DMA_READ_FROM_MEM				1
-
 void DMAClockControl(uint8_t DMA_Number ,uint8_t En);
 
 
@@ -54,7 +33,7 @@ void DMAClockControl(uint8_t DMA_Number ,uint8_t En);
  *  DMA configuration function
  *  @parameters which should be passed throught @DMA_Handle_t:
  *  - DMA_Handler -> DMA_NUMBER					SEE @DMA_NUMBERS
- *  - DMA_Handler -> CHANNEL_NUMBER				NUMBER FROM 0-7
+ *  - DMA_Handler -> CHANNEL_NUMBER				SEE @DMA_CHANNELS
  *  - DMA_Handler -> SOURCE_ADDRESS				32-bit periph/memory
  *  											source base address
  *  - DMA_Handler -> DESTINATION_ADDRESS		32-bit memory base address

@@ -373,10 +373,15 @@ __vo uint32_t SPIx_I2SPR;
 #define	 DMA_1 ((DMA_RegDef_t*)DMA_1_BASEADDR)
 #define	 DMA_2 ((DMA_RegDef_t*)DMA_2_BASEADDR)
 
-
+/*
+ * DMA_NUMBERS
+ */
 #define DMA_NUM_1					1
 #define DMA_NUM_2					2
 
+/*
+ * DMA_CHANNELS
+ */
 #define DMA_CHANNEL_1				1
 #define DMA_CHANNEL_2				2
 #define DMA_CHANNEL_3				3
@@ -384,6 +389,27 @@ __vo uint32_t SPIx_I2SPR;
 #define DMA_CHANNEL_5				5
 #define DMA_CHANNEL_6				6
 #define DMA_CHANNEL_7				7
+
+/*
+ * DMA_PRIORITIES
+ */
+#define DMA_PRIORITY_LOW				0
+#define DMA_PRIORITY_MEDIUM				1
+#define DMA_PRIORITY_HIGH				2
+#define DMA_PRIORITY_VERY_HIGH			3
+
+/*
+ * DMA_MEM_SIZE
+ */
+#define DMA_MEM_SIZE_8_BIT				0
+#define DMA_MEM_SIZE_16_BIT				1
+#define DMA_MEM_SIZE_32_BIT				2
+
+/*
+ * DMA_DIRECTIONS
+ */
+#define DMA_READ_FROM_PERIPH			0
+#define DMA_READ_FROM_MEM				1
 
 #define USART1 ((USART_RegDef_t *)USART_1_BASEADDR)
 
