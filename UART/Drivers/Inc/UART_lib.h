@@ -35,7 +35,7 @@ typedef struct{
 
 }USART_Handle_t;
 
-void UART_PeriClockControl(uint8_t Clock_State);
+void UART_PeriClockControl(USART_RegDef_t * USART, uint8_t Clock_State);
 
 void UART_Init(USART_Handle_t* UART);
 

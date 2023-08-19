@@ -412,6 +412,10 @@ __vo uint32_t SPIx_I2SPR;
 #define DMA_READ_FROM_MEM				1
 
 #define USART1 ((USART_RegDef_t *)USART_1_BASEADDR)
+#define USART2 ((USART_RegDef_t *)USART_2_BASEADDR)
+#define USART3 ((USART_RegDef_t *)USART_3_BASEADDR)
 
+#define UART4 ((USART_RegDef_t *)UART_4_BASEADDR)
+#define UART5 ((USART_RegDef_t *)UART_5_BASEADDR)
 
 #endif /* STM32F3XX_H_ */

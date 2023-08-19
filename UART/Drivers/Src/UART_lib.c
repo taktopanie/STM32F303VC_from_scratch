@@ -10,17 +10,39 @@
 
 #include<stdio.h>
 
-char BUFFOR [200];
+#define MAX_BUFF 200
 
-void UART_PeriClockControl(uint8_t Clock_State){
+char BUFFOR [MAX_BUFF];
+
+void UART_PeriClockControl(USART_RegDef_t * USART, uint8_t Clock_State){
 	if( Clock_State == ENABLE){
-		//turn on UART clock
-		RCC->APB2ENR |= (1 << 14);
-		}else{
-		//MAYBE IN THE FUTURE - not in sample project
+		//turn ON UART clock
+		if (USART == USART1){
+			RCC->APB2ENR |= (1 << 14);
+		}else if (USART == USART2){
+			RCC->APB1ENR |= (1 << 17);
+		}else if (USART == USART3){
+			RCC->APB1ENR |= (1 << 18);
+		}else if (USART == UART4){
+			RCC->APB1ENR |= (1 << 19);
+		}else if (USART == UART5){
+			RCC->APB1ENR |= (1 << 20);
+		}
+	}else if( Clock_State == DISABLE){
+		//turn OFF UART clock
+		if (USART == USART1){
+			RCC->APB2ENR &= ~(1 << 14);
+		}else if (USART == USART2){
+			RCC->APB1ENR &= ~(1 << 17);
+		}else if (USART == USART3){
+			RCC->APB1ENR &= ~(1 << 18);
+		}else if (USART == UART4){
+			RCC->APB1ENR &= ~(1 << 19);
+		}else if (USART == UART5){
+			RCC->APB1ENR &= ~(1 << 20);
+		}
 	}
 }
-
 
 void UART_Init(USART_Handle_t* UART){
 
@@ -42,8 +64,8 @@ void UART_Init(USART_Handle_t* UART){
 		//ENABLE RXNE IRQ
 		UART->USART->USART_CR1 |= (1 << 5);
 
-		//ENABLE TC IRQ
-		UART->USART->USART_CR1 |= (1 << 6);
+		//ENABLE TC IRQ -- TURNED OFF BECAUE MAKE MESS WITH SENDING(TC CLEARED IN WHILE LOOP)
+		//UART->USART->USART_CR1 |= (1 << 6);
 
 		//ENABLE THE UART RECEIVER
 		UART->USART->USART_CR1 |= (1 << 2);
@@ -51,12 +73,19 @@ void UART_Init(USART_Handle_t* UART){
 		//ENABLE THE UART TRANSMITTER
 		UART->USART->USART_CR1 |= (1 << 3);
 
+		//WHILE TC FLAG SET NOT SET -- AFTER IDLE FRAME
+		while(!(UART->USART->USART_ISR & (1 << 6)));
+
+		//CLEAR THE FLAG
+		USART1->USART_ICR |= (1 << 6);
+
 		//USART1_EXTI25 interrupt enable
 		*NVIC_ISER1 |= (1 << 5);
 
 }
 
 void UART_SendChar(USART_RegDef_t * UART, char* sign){
+	//WHILE TXE FLAG NOT SET
 	while(!(UART->USART_ISR & (1 << 7)));
 	UART->USART_TDR = *sign;
 }
@@ -64,6 +93,8 @@ void UART_SendChar(USART_RegDef_t * UART, char* sign){
 void UART_ReceiveChar(USART_RegDef_t * UART){
 	static int i = 0;
 	BUFFOR[i] = (char)UART->USART_RDR;
+	//TODO:function protecting buffor against overflow
+
 	//when receives enter[carriage return] sign print the buffor
 	if(BUFFOR[i++] == 0x0D){
 		printf("%s\n", BUFFOR);
@@ -85,16 +116,22 @@ void UART_SendString(USART_RegDef_t * UART,  char* sign, uint8_t number_of_chars
 	}
 
 	//ENABLE TC IRQ
-	if( !(UART->USART_CR1 & (1<<6)) ){
-		UART->USART_CR1 |= (1 << 6);
-	}
+	//if( !(UART->USART_CR1 & (1<<6)) ){
+	//	UART->USART_CR1 |= (1 << 6);
+	//}
 
 
 	for (int i = 0; i < number_of_chars; i++){
 		UART_SendChar(UART, sign++);
 	}
 
+	//WHILE TC FLAG SET NOT SET
+	while(!(UART->USART_ISR & (1 << 6)));
+
+	//CLEAR THE FLAG
+	UART->USART_ICR |= (1 << 6);
+
 	//DISABLE TX UART === affects DMA
-	//UART->USART_CR1 &= ~(1 << 3);
+	UART->USART_CR1 &= ~(1 << 3);
 }
 
