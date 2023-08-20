@@ -10,8 +10,6 @@
 
 #include<stdio.h>
 
-#define MAX_BUFF 200
-
 char BUFFOR [MAX_BUFF];
 
 void UART_PeriClockControl(USART_RegDef_t * USART, uint8_t Clock_State){
@@ -84,28 +82,42 @@ void UART_Init(USART_Handle_t* UART){
 
 }
 
+void BUFFOR_flush(char* buf){
+	for(int i =0; i < MAX_BUFF; i++){
+		if(buf[i]!= 0 ){
+			buf[i]=0;
+		}else{
+			return;
+		}
+	}
+}
+
 void UART_SendChar(USART_RegDef_t * UART, char* sign){
 	//WHILE TXE FLAG NOT SET
 	while(!(UART->USART_ISR & (1 << 7)));
 	UART->USART_TDR = *sign;
 }
 
-void UART_ReceiveChar(USART_RegDef_t * UART){
+uint8_t UART_ReceiveChar(USART_RegDef_t * UART){
 	static int i = 0;
 	BUFFOR[i] = (char)UART->USART_RDR;
 	//TODO:function protecting buffor against overflow
 
 	//when receives enter[carriage return] sign print the buffor
-	if(BUFFOR[i++] == 0x0D){
-		printf("%s\n", BUFFOR);
-
-		//flush the BUFFOR
-		for(int p = 0; p < i; p ++){
-			BUFFOR[p] = 0;
-		}
-
+	if(BUFFOR[i++] == 0x0A){
+		uint8_t tmp = i;
 		i = 0;
+		return tmp;
 	}
+	return 0;
+}
+
+void UART_ReceiveString(char* buff, uint8_t char_amount){
+	for(int p = 0; p < char_amount; p ++){
+		buff[p]=BUFFOR[p];
+	}
+	//flush the BUFFOR
+	BUFFOR_flush(BUFFOR);
 }
 
 void UART_SendString(USART_RegDef_t * UART,  char* sign, uint8_t number_of_chars){

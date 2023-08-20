@@ -25,6 +25,7 @@
 #define STOP_BITS_2						2
 #define STOP_BITS_1_5					3
 
+#define MAX_BUFF 200
 
 
 typedef struct{
@@ -39,8 +40,11 @@ void UART_PeriClockControl(USART_RegDef_t * USART, uint8_t Clock_State);
 
 void UART_Init(USART_Handle_t* UART);
 
+void BUFFOR_flush(char* buf);
+
 void UART_SendChar(USART_RegDef_t * UART, char* sign);
-void UART_ReceiveChar(USART_RegDef_t * UART);
+uint8_t  UART_ReceiveChar(USART_RegDef_t * UART);
+void UART_ReceiveString(char* buff, uint8_t char_amount);
 
 void UART_SendString(USART_RegDef_t * UART,  char* sign, uint8_t number_of_chars);
 
