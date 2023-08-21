@@ -120,13 +120,88 @@ DMA_CCRx register
 }
 
 void DMA_IRQ_handling(DMA_RegDef_t* DMA_handler){
+	if(DMA_handler->DMA_ISR & (1<<0)){
+		DMA_handler->DMA_IFCR |= (1<<0);
+	}
+	if(DMA_handler->DMA_ISR & (1<<4)){
+		DMA_handler->DMA_IFCR |= (1<<4);
+	}
+	if(DMA_handler->DMA_ISR & (1<<8)){
+		DMA_handler->DMA_IFCR |= (1<<8);
+	}
+	if(DMA_handler->DMA_ISR & (1<<12)){
+		DMA_handler->DMA_IFCR |= (1<<12);
+	}
+	if(DMA_handler->DMA_ISR & (1<<16)){
+		DMA_handler->DMA_IFCR |= (1<<16);
+	}
+	if(DMA_handler->DMA_ISR & (1<<20)){
+		DMA_handler->DMA_IFCR |= (1<<20);
+	}
 	if(DMA_handler->DMA_ISR & (1<<24)){
 		DMA_handler->DMA_IFCR |= (1<<24);
 	}
-	if(DMA_handler->DMA_ISR & (1<<25)){
-		DMA_handler->DMA_IFCR |= (1<<25);
-	}
-	if(DMA_handler->DMA_ISR & (1<<26)){
-		DMA_handler->DMA_IFCR |= (1<<26);
+}
+
+void DMA_interrupt_set(uint8_t DMA_number, uint8_t DMA_channel){
+
+	uint32_t * wsk;
+
+	if(DMA_number == DMA_NUM_1){
+
+		wsk = (uint32_t*)(NVIC_VECT_0);
+
+		switch(DMA_channel){
+			case 1:
+				*wsk |= (1<<11);
+				break;
+			case 2:
+				*wsk |= (1<<12);
+				break;
+			case 3:
+				*wsk |= (1<<13);
+				break;
+			case 4:
+				*wsk |= (1<<14);
+				break;
+			case 5:
+				*wsk |= (1<<15);
+				break;
+			case 6:
+				*wsk |= (1<<16);
+				break;
+			case 7:
+				*wsk |= (1<<17);
+				break;
+
+		}
+	}else if (DMA_number == DMA_NUM_2){
+
+		wsk = (uint32_t*)(NVIC_VECT_1);
+
+		switch(DMA_channel){
+			case 1:
+				*wsk |= (1<<24);
+				break;
+			case 2:
+				*wsk |= (1<<25);
+				break;
+			case 3:
+				*wsk |= (1<<26);
+				break;
+			case 4:
+				*wsk |= (1<<27);
+				break;
+			case 5:
+				*wsk |= (1<<28);
+				break;
+			case 6:
+				*wsk |= (1<<29);
+				break;
+			case 7:
+				*wsk |= (1<<30);
+				break;
+
+		}
 	}
 }

@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <MY_interrupt.h>
 #include <TIMER_lib.h>
 
 void GPIOInits(void){
@@ -64,7 +63,7 @@ int main (void){
 void TIM2_IRQHandler(void){
 //Reset timer flag
 
-TIMER2->TIMx_SR &= ~(1<<0);
+Timer_IRQ_handling(TIMER2);
 static int zmienna = 8;
 
 GPIO_TogglePin(GPIOE, zmienna++);

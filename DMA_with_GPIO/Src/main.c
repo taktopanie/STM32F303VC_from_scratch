@@ -20,11 +20,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <TIMER_lib.h>
-#include <MY_interrupt.h>
 #include <GPIO_lib.h>
 #include <DMA_lib.h>
 
-uint32_t BUFFOR[20];
+uint32_t buff[20];
 
 void GPIOInits(void){
 	GPIO_Handle_t GPIOPins;
@@ -161,7 +160,7 @@ int main (void){
 
 	timer_abnormal_clk();
 
-	DMAInit(BUFFOR);
+	DMAInit(buff);
 
 	while(1){
 	}

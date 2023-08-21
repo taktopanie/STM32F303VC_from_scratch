@@ -22,7 +22,6 @@
 #include <stdlib.h>
 
 #include<TIMER_lib.h>
-#include<MY_interrupt.h>
 
 #include<DMA_lib.h>
 
@@ -134,6 +133,7 @@ void DMA1_CH5_IRQHandler(){
 }
 
 void TIM2_IRQHandler(){
+	Timer_IRQ_handling(TIMER2);
 	Timer_indicate_time(TIMER2);
 
 }

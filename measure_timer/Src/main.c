@@ -24,7 +24,6 @@
 
 
 #include<TIMER_lib.h>
-#include<MY_interrupt.h>
 
 
 void GPIOInits(void){
@@ -100,6 +99,7 @@ int main (void){
 	timer_3.TIM_ARR = (1000-1);
 	timer_3.TIM_PRESCALLER = (800-1);
 	timer_3.TIM_COUNTER_mode= COUNTER_MODE_DOWN;
+	timer_3.TIM_ONEPULSE = 0;
 
 	Timer_Init_FREE_RUN(&timer_3);
 	TIMER_interrupt_set(timer_3.TIMER);
@@ -113,14 +113,14 @@ int main (void){
 
 
 void TIM2_IRQHandler(){
-
+	Timer_IRQ_handling(TIMER2);
 	Timer_indicate_time(TIMER2);
 
 }
 
 void TIM3_IRQHandler(){
 	//Reset timer flag
-	TIMER3->TIMx_SR &= ~(1<<0);
+	Timer_IRQ_handling(TIMER3);
 	static int zmienna = 8;
 
 	GPIO_TogglePin(GPIOE, zmienna++);

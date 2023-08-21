@@ -27,22 +27,22 @@ void pin_init(){
 
 	GPIO_Handle_t GPIO_def;
 	GPIO_def.GPIO_config.Pin_Number = GPIO_PIN_0;
-	GPIO_def.GPIO_config.Pin_Mode = GPIO_MODE_ALTERNATE;
+	GPIO_def.GPIO_config.Pin_Mode = GPIO_MODE_INPUT;
 	GPIO_def.GPIO_config.Pin_Output_Type = GPIO_PUSH_PULL;
 	GPIO_def.GPIO_config.Pin_Pull = GPIO_NO_PULL;
 	GPIO_def.GPIO_config.Pin_Speed = GPIO_SPEED_HIGH;
-	GPIO_def.GPIO_config.Pin_alt_func = AF_0;
-
 	GPIO_def.GPIO_Regdef = GPIOA;
 
 	GPIO_Init(&GPIO_def);
+
+	GPIO_interrupt_set(EDGE_BOTH, GPIO_PIN_0);
+
 	GPIO_IRQITConfig(6, ENABLE);
 }
 
 int main(void)
 {
 	pin_init();
-
 	/* Loop forever */
 	for(;;);
 }

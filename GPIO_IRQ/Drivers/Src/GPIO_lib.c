@@ -301,8 +301,45 @@ void GPIO_IRQHandling(uint8_t PinNumber){
 		EXTI->PR1 |= (1 << PinNumber);
 		//FUNCTION BODY
 		//GPIO_TogglePin(GPIOE, GPIO_PIN_15);
+	}
+}
 
+void GPIO_interrupt_set(uint8_t Edge, uint8_t PinNumber){
+
+	uint32_t * wsk;
+	//RRC SYSCFG clock enable for EXTI
+	wsk = (uint32_t*)(RRC_OFFSET + 0x18UL);
+	*wsk |= (1<<0);
+
+	//EXTI edge detection
+	if(Edge == EDGE_RISING){
+		//Turn off falling edge
+		wsk = (uint32_t*)(EXTI_OFFSET + 0x0CUL);
+		*wsk &= ~(1 << PinNumber);
+
+		//turn on rising edge
+		wsk = (uint32_t*)(EXTI_OFFSET + 0x08UL);
+		*wsk |= (1 << PinNumber);
+	}else if(Edge == EDGE_FALLING){
+		//Turn off rising edge
+		wsk = (uint32_t*)(EXTI_OFFSET + 0x08UL);
+		*wsk &= ~(1 << PinNumber);
+
+		//turn on falling edge
+		wsk = (uint32_t*)(EXTI_OFFSET + 0x0CUL);
+		*wsk |= (1 << PinNumber);
+	}else if(Edge == EDGE_BOTH){
+		//Turn on rising edge
+		wsk = (uint32_t*)(EXTI_OFFSET + 0x08UL);
+		*wsk |= (1 << PinNumber);
+
+		//turn on falling edge
+		wsk = (uint32_t*)(EXTI_OFFSET + 0x0CUL);
+		*wsk |= (1 << PinNumber);
 	}
 
+	//Exti interrupt enable
+	wsk = (uint32_t*)(EXTI_OFFSET + 0x00UL);
+	*wsk |= (1<< PinNumber);
 
 }

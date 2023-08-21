@@ -17,95 +17,37 @@
  */
 
 #include <stdint.h>
-#include <stdio.h>
-#include<stm32f3xx.h>
 #include <GPIO_lib.h>
-#include <UART_lib.h>
+#include <stdio.h>
 
-#define DEBUGING_PRINTS 0
 
-void UARTGPIOInit(void){
-//GPIO_RegDef_t* GPIO = (GPIO_RegDef_t*)GPIOE;
+void pin_init(){
 
-PeriClockControl(GPIOA, CLOCK_ENABLE);
+	PeriClockControl(GPIOA, CLOCK_ENABLE);
 
-GPIO_Handle_t GPIO_Pins ;
+	GPIO_Handle_t GPIO_def;
+	GPIO_def.GPIO_config.Pin_Number = GPIO_PIN_0;
+	GPIO_def.GPIO_config.Pin_Mode = GPIO_MODE_INPUT;
+	GPIO_def.GPIO_config.Pin_Output_Type = GPIO_PUSH_PULL;
+	GPIO_def.GPIO_config.Pin_Pull = GPIO_NO_PULL;
+	GPIO_def.GPIO_config.Pin_Speed = GPIO_SPEED_HIGH;
 
-GPIO_Pins.GPIO_Regdef = GPIOA;
+	GPIO_def.GPIO_Regdef = GPIOA;
 
-GPIO_Pins.GPIO_config.Pin_Mode = GPIO_MODE_ALTERNATE;
-GPIO_Pins.GPIO_config.Pin_Output_Type = GPIO_PUSH_PULL;
-//PULL UP UART PINS RESOLVE IDLE FRAM ISSUE
-GPIO_Pins.GPIO_config.Pin_Pull = GPIO_PULL_UP;
-GPIO_Pins.GPIO_config.Pin_Speed = GPIO_SPEED_HIGH;
-GPIO_Pins.GPIO_config.Pin_alt_func = AF_7;
-
-GPIO_Pins.GPIO_config.Pin_Number = GPIO_PIN_9;
-GPIO_Init(&GPIO_Pins);
-
-GPIO_Pins.GPIO_config.Pin_Number = GPIO_PIN_10;
-GPIO_Init(&GPIO_Pins);
-
+	GPIO_Init(&GPIO_def);
+	GPIO_interrupt_set(EDGE_RISING, GPIO_PIN_0);
+	GPIO_IRQITConfig(6, ENABLE);
 }
-
-void UARTInit(USART_Handle_t* UART_1_handler){
-	UART_PeriClockControl(USART1, ENABLE);
-	UART_1_handler->USART = USART1;
-	UART_1_handler->baud = BAUD_RATE_9600;
-	UART_1_handler->data_bits = DATA_BITS_7;
-	UART_1_handler->stop_bits = STOP_BITS_1;
-	UART_Init(UART_1_handler);
-}
-
 
 int main(void)
 {
-	//TODO POWERSAFE MODE IN IDLE
-	if(DEBUGING_PRINTS)
-		printf("Program in MAIN function.\n");
+	pin_init();
 
-	USART_Handle_t UART_1_handler;
-
-	UARTGPIOInit();
-
-	UARTInit(&UART_1_handler);
-
-
-	char WELCOME_TEXT [] = "Microcontroler STM32F303VC\r\nReady to work...\r\n";
-	//send string with NULL value at the end(if not needed -1 from sizeof)
-	UART_SendString(UART_1_handler.USART,WELCOME_TEXT, (sizeof(WELCOME_TEXT)-1));
-	//UART_SendString(UART_1_handler.USART,"END..\n\r\n", sizeof("END..\n\r"));
 	/* Loop forever */
-	for(;;){
-
-
-	}
-
+	for(;;);
 }
 
-void USART1_EXTI25_IRQHandler(){
-
-	// TRANSMIT COMPLETE IRQ
-	if(USART1->USART_ISR & (1 << 6)){
-
-		if(DEBUGING_PRINTS)
-			printf("TC IRQ\n");
-
-		//clear the TC IRQ flag
-		USART1->USART_ICR |= (1 << 6);
-	}
-
-	// READ DATA REGISTER NOT EMPTY IRQ
-	if(USART1->USART_ISR & (1 << 5)){
-
-		if(DEBUGING_PRINTS)
-			printf("RXNE IRQ\n");
-
-		//clear the TC IRQ flag
-		USART1->USART_ICR |= (1 << 5);
-		UART_ReceiveChar(USART1);
-		GPIO_TogglePin(GPIOA, GPIO_PIN_8);
-
-	}
-
+void EXTI0_IRQHandler (void){
+	printf("HELLO from IRQ EXTI0\n");
+	GPIO_IRQHandling(GPIO_PIN_0);
 }

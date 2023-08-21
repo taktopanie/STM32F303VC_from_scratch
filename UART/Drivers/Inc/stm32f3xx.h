@@ -78,6 +78,24 @@ void systick (int time_ms);
 #define USART_3_BASEADDR			0x40004800UL
 #define UART_4_BASEADDR				0x40004C00UL
 #define UART_5_BASEADDR				0x40005000UL
+
+////////////////////////////////////// FOR DELETE
+#define EXTI_OFFSET 0x40010400UL
+#define RRC_OFFSET 0x40021000UL
+
+#define NVIC_BASE	0xE000E100
+
+#define NVIC_VECT_0 NVIC_BASE
+#define NVIC_VECT_1 NVIC_BASE + 0x4
+
+////////////////////////////////////////////////////
+/*
+ * Interrupt edges detection
+ */
+#define EDGE_FALLING	0
+#define EDGE_RISING		1
+#define EDGE_BOTH		2
+
 /*
  * Registers typedef
  */
@@ -373,43 +391,6 @@ __vo uint32_t SPIx_I2SPR;
 #define	 DMA_1 ((DMA_RegDef_t*)DMA_1_BASEADDR)
 #define	 DMA_2 ((DMA_RegDef_t*)DMA_2_BASEADDR)
 
-/*
- * DMA_NUMBERS
- */
-#define DMA_NUM_1					1
-#define DMA_NUM_2					2
-
-/*
- * DMA_CHANNELS
- */
-#define DMA_CHANNEL_1				1
-#define DMA_CHANNEL_2				2
-#define DMA_CHANNEL_3				3
-#define DMA_CHANNEL_4				4
-#define DMA_CHANNEL_5				5
-#define DMA_CHANNEL_6				6
-#define DMA_CHANNEL_7				7
-
-/*
- * DMA_PRIORITIES
- */
-#define DMA_PRIORITY_LOW				0
-#define DMA_PRIORITY_MEDIUM				1
-#define DMA_PRIORITY_HIGH				2
-#define DMA_PRIORITY_VERY_HIGH			3
-
-/*
- * DMA_MEM_SIZE
- */
-#define DMA_MEM_SIZE_8_BIT				0
-#define DMA_MEM_SIZE_16_BIT				1
-#define DMA_MEM_SIZE_32_BIT				2
-
-/*
- * DMA_DIRECTIONS
- */
-#define DMA_READ_FROM_PERIPH			0
-#define DMA_READ_FROM_MEM				1
 
 #define USART1 ((USART_RegDef_t *)USART_1_BASEADDR)
 #define USART2 ((USART_RegDef_t *)USART_2_BASEADDR)

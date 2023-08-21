@@ -11,6 +11,30 @@
 #include<stm32f3xx.h>
 
 
+/********************** HOW TO SET UP GPIO **********************
+ * 1. Turn on GPIO port clock by PeriClockControl()
+ *
+ * 2. Create @GPIO_Handle_t and fill it with below informations
+ * 	- GPIO_Handler.GPIO_Regdef -> GPIO_ADDRESS			SEE @GPIOADDRESS
+ *  - GPIO_Handler.GPIO_config -> Pin_Number			SEE @PIN_NUMBERS
+ *  - GPIO_Handler.GPIO_config -> Pin_Mode				SEE @GPIO_PIN_MODES
+ *  - GPIO_Handler.GPIO_config -> Pin_Output_Type;		SEE @GPIO_OUT_TYPES
+ *  - GPIO_Handler.GPIO_config -> Pin_Speed;			SEE @GPIO_SPEED
+ *  - GPIO_Handler.GPIO_config -> Pin_Pull;				SEE @GPIO_PULL
+ *  - GPIO_Handler.GPIO_config -> Pin_alt_func;			SEE @ALTERNATE_FUNCTIONS
+ *
+ * 3. Call the function GPIO_Init() to initialize the GPIO
+ *
+********************** IF IRQ's are needed **********************
+ *
+ * 4. Fill the IRQ handler function EXTIx_IRQHandler()
+ *
+ * 5. Set up interrupt seting's in GPIO_interrupt_set()
+ *
+ * 4. Turn on NVIC_vector by GPIO_IRQITConfig()
+ *
+****************************************************************/
+
 /*
  * GPIO Pin configuration structure
  */
@@ -25,8 +49,8 @@ typedef struct{
 }GPIO_PinConfig_t;
 
 typedef struct{
-	GPIO_RegDef_t * GPIO_Regdef;
-	GPIO_PinConfig_t GPIO_config;
+	GPIO_RegDef_t * GPIO_Regdef;	/*<	value can be one of @GPIOADDRESS */
+	GPIO_PinConfig_t GPIO_config;	/*<	the GPIO config structure */
 
 }GPIO_Handle_t;
 
@@ -138,5 +162,7 @@ void GPIO_IRQITConfig(uint8_t IRQNumber, uint8_t EnorDi);
 void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority);
 
 void GPIO_IRQHandling(uint8_t PinNumber);
+
+void GPIO_interrupt_set(uint8_t Edge, uint8_t PinNumber);
 
 #endif /* GPIO_LIB_H_ */

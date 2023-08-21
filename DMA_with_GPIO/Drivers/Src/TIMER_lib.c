@@ -216,12 +216,7 @@ void Timer_IRQ_handling(Timer_RegDef* TIMER_pointer){
 
 }
 
-
-
 void Timer_indicate_time(Timer_RegDef* timer){
-
-	//CLEAN the interrupt FLAG
-	Timer_IRQ_handling(timer);
 
 	static int var_old = 0;
 	volatile long int var_curr = timer->TIMx_CR1;
@@ -241,3 +236,21 @@ void Timer_indicate_time(Timer_RegDef* timer){
 		var_old = var_curr;
 	}
 }
+
+void TIMER_interrupt_set(Timer_RegDef* wsk_tim){
+	uint32_t * wsk;
+	wsk = (uint32_t*)(NVIC_VECT_0);
+
+	//Enable NVIC interrupt
+	if(wsk_tim == TIMER2){
+		//28 line interrupt TIM2
+		*wsk |= (1<< 28);
+	}else if(wsk_tim == TIMER3){
+		//29 line interrupt TIM3
+		*wsk |= (1<< 29);
+	}else if(wsk_tim == TIMER4){
+		//30 line interrupt TIM4
+		*wsk |= (1<< 30);
+	}
+}
+

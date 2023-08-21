@@ -73,6 +73,29 @@ void systick (int time_ms);
 #define DMA_1_BASEADDR				0x40020000UL
 #define DMA_2_BASEADDR				0x40020400UL
 
+#define USART_1_BASEADDR			0x40013800UL
+#define USART_2_BASEADDR			0x40004400UL
+#define USART_3_BASEADDR			0x40004800UL
+#define UART_4_BASEADDR				0x40004C00UL
+#define UART_5_BASEADDR				0x40005000UL
+
+////////////////////////////////////// FOR DELETE
+#define EXTI_OFFSET 0x40010400UL
+#define RRC_OFFSET 0x40021000UL
+
+#define NVIC_BASE	0xE000E100
+
+#define NVIC_VECT_0 NVIC_BASE
+#define NVIC_VECT_1 NVIC_BASE + 0x4
+
+////////////////////////////////////////////////////
+/*
+ * Interrupt edges detection
+ */
+#define EDGE_FALLING	0
+#define EDGE_RISING		1
+#define EDGE_BOTH		2
+
 /*
  * Registers typedef
  */
@@ -206,6 +229,21 @@ typedef struct {
 	__vo uint32_t DMA_CPAR7;
 	__vo uint32_t DMA_CMAR7;
 }DMA_RegDef_t;
+
+typedef struct{
+	__vo uint32_t USART_CR1;
+	__vo uint32_t USART_CR2;
+	__vo uint32_t USART_CR3;
+	__vo uint32_t USART_BRR;
+	__vo uint32_t USART_GTPR;
+	__vo uint32_t USART_RTOR;
+	__vo uint32_t USART_RQR;
+	__vo uint32_t USART_ISR;
+	__vo uint32_t USART_ICR;
+	__vo uint32_t USART_RDR;
+	__vo uint32_t USART_TDR;
+
+}USART_RegDef_t;
 
 /*
  * Peripheral definitions
@@ -354,15 +392,11 @@ __vo uint32_t SPIx_I2SPR;
 #define	 DMA_2 ((DMA_RegDef_t*)DMA_2_BASEADDR)
 
 
-#define DMA_NUM_1					1
-#define DMA_NUM_2					2
+#define USART1 ((USART_RegDef_t *)USART_1_BASEADDR)
+#define USART2 ((USART_RegDef_t *)USART_2_BASEADDR)
+#define USART3 ((USART_RegDef_t *)USART_3_BASEADDR)
 
-#define DMA_CHANNEL_1				1
-#define DMA_CHANNEL_2				2
-#define DMA_CHANNEL_3				3
-#define DMA_CHANNEL_4				4
-#define DMA_CHANNEL_5				5
-#define DMA_CHANNEL_6				6
-#define DMA_CHANNEL_7				7
+#define UART4 ((USART_RegDef_t *)UART_4_BASEADDR)
+#define UART5 ((USART_RegDef_t *)UART_5_BASEADDR)
 
 #endif /* STM32F3XX_H_ */

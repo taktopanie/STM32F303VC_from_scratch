@@ -12,6 +12,58 @@
 
 #define __vo volatile
 
+/********************** HOW TO SET UP FREE RUN TIMER **********************
+ * 1. Create @Timer_Handle_t and fill it with below informations
+ *  - TIMER_handler->TIM_ARR
+ *  - TIMER_handler->TIM_prescaler
+ *  - TIMER_handler->TIMER
+ *  - TIMER_handler->TIM_Counter_mode. SEE @COUNTER_MODE
+ *  - TIMER_handler->TIM_OnePulse_mode. 1-ON, 0-OFF
+ *
+ * 2. Call the function Timer_Init_FREE_RUN() to initialize the TIMER
+ *
+ * 3. Fill the TIMx_IRQHandler() with Timer_IRQ_handling() inside
+ *
+ * 4. Call the function TIMER_interrupt_set() to initialize interrupt
+ *
+ *
+ *********************** HOW TO SET UP INPUT_CC TIMER **********************
+ * 1. Create @Timer_Handle_t and fill it with below informations
+ *  - TIMER_handler -> TIM_ARR
+ *  - TIMER_handler -> TIM_prescaler
+ *  - TIMER_handler -> TIMER
+ *	- TIMER_handler -> TIM_COUNTER_mode. 	SEE @COUNTER_MODE
+ *	- TIMER_handler -> TIM_EDGE_TRIGGER. 	SEE @TIMER_EDGE
+ *	- TIMER_handler -> TIM_INT_PRSC			SEE @IRQ_PRESCALER
+ *	- TIMER_handler -> TIM_FILTERING		SEE @IRQ_FILTERING
+ *	- TIMER_handler->TIM_OnePulse_mode. 	1-ON, 0-OFF
+ *
+ * 2. Set up GPIO's to its AF functions
+ *
+ * 3. Call the function Timer_Init_INPUT_CC_MODE() to initialize the TIMER
+ *
+ * 4. Fill the TIMx_IRQHandler() with Timer_IRQ_handling() inside
+ *
+ * 5. Call the function TIMER_interrupt_set() to initialize interrupt
+ *
+ *
+ *********************** HOW TO SET UP SIMPLE PWM_MODE **********************
+ * 1. Create @Timer_Handle_t and fill it with below informations
+ *  - TIMER_handler->TIM_ARR
+ *  - TIMER_handler->TIM_prescaler
+ *  - TIMER_handler->TIMER
+ *	- TIMER_handler->PWM_inverted mode		1-ON, 0-OFF
+ *	- Tuner_handler->PWM_width_percent 		value between 0 and 100
+ *	- TIMER_handler->TIM_OnePulse_mode. 	1-ON, 0-OFF
+ *
+ * 2. Set up GPIO's to its AF functions
+ *
+ * 3. Call the function Timer_Init_PWM_MODE() to initialize the TIMER
+ *
+ * 4. Call the function TIMER_interrupt_set() to initialize interrupt
+ *
+ *****************************************************************/
+
 /*
  * @COUNTER_MODE
  */
@@ -121,5 +173,7 @@ void Timer_IRQ_handling(Timer_RegDef* TIMER_handler);
  *	8Mhz clock = prescaler = 8000,
  */
 void Timer_indicate_time(Timer_RegDef* timer);
+
+void TIMER_interrupt_set(Timer_RegDef* wsk_tim);
 
 #endif /* INC_TIMER_LIB_H_ */
