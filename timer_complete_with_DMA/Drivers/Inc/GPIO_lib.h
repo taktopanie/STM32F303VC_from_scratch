@@ -27,11 +27,13 @@
  *
 ********************** IF IRQ's are needed **********************
  *
- * 4. Fill the IRQ handler function EXTIx_IRQHandler()
+ * 4. Fill the IRQ handler function EXTIx_IRQHandler() with GPIO_IRQHandling();
  *
  * 5. Set up interrupt seting's in GPIO_interrupt_set()
  *
- * 4. Turn on NVIC_vector by GPIO_IRQITConfig()
+ * 6. Map the EXTI channel to proper GPIO port by GPIO_EXTI_PortMap();
+ *
+ * 7. Turn on NVIC_vector by GPIO_IRQITConfig()
  *
 ****************************************************************/
 
@@ -143,6 +145,7 @@ typedef struct{
 #define AF_14							14
 #define AF_15							15
 
+
 /*
  * GPIO function definition
  */
@@ -164,5 +167,7 @@ void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority);
 void GPIO_IRQHandling(uint8_t PinNumber);
 
 void GPIO_interrupt_set(uint8_t Edge, uint8_t PinNumber);
+
+void GPIO_EXTI_PortMap(uint8_t EXTI_NR, GPIO_RegDef_t * GPIOx);
 
 #endif /* GPIO_LIB_H_ */

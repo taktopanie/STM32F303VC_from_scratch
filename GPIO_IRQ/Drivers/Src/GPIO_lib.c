@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include <GPIO_lib.h>
 
-
 /*
  * @fn					- PeriClockControl
  *
@@ -299,6 +298,8 @@ void GPIO_IRQHandling(uint8_t PinNumber){
 	if(EXTI->PR1 & (1 << PinNumber)){
 		//clear
 		EXTI->PR1 |= (1 << PinNumber);
+
+		while(EXTI->PR1 & (1 << PinNumber));
 		//FUNCTION BODY
 		//GPIO_TogglePin(GPIOE, GPIO_PIN_15);
 	}
@@ -341,5 +342,45 @@ void GPIO_interrupt_set(uint8_t Edge, uint8_t PinNumber){
 	//Exti interrupt enable
 	wsk = (uint32_t*)(EXTI_OFFSET + 0x00UL);
 	*wsk |= (1<< PinNumber);
+
+}
+
+/*
+ * @fn					- GPIO_EXTI_PortMap
+ *
+ * @brief				- function for EXTI port maping
+ *
+ * @param[in]			- @EXTI_NR - EXTI number - search for @IRQ_numbers
+ * @param[in]			- @GPIOx - GPIOx port - search for @GPIOADDRESS
+ *
+ * @return				- void
+ */
+void GPIO_EXTI_PortMap(uint8_t EXTI_NR, GPIO_RegDef_t * GPIOx){
+
+	uint8_t map;
+	if(GPIOx == GPIOA){
+		map = 0;
+	}else if (GPIOx == GPIOB){
+		map = 1;
+	}else if (GPIOx == GPIOC){
+		map = 2;
+	}else if (GPIOx == GPIOD){
+		map = 3;
+	}else if (GPIOx == GPIOE){
+		map = 4;
+	}
+
+	if(EXTI_NR >= 0 && EXTI_NR < 4){
+		*SYSCFG_EXTICR1 |= (map << ((EXTI_NR % 4) * 4));
+	}
+	if (EXTI_NR >= 4 && EXTI_NR < 8){
+		*SYSCFG_EXTICR2 |= (map << ((EXTI_NR % 4) * 4));
+	}
+	if (EXTI_NR >= 8 && EXTI_NR < 12){
+		*SYSCFG_EXTICR3 |= (map << ((EXTI_NR % 4) * 4));
+	}
+	if (EXTI_NR >= 12 && EXTI_NR < 16){
+		*SYSCFG_EXTICR4 |= (map << ((EXTI_NR % 4) * 4));
+	}
 
 }
