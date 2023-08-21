@@ -79,6 +79,11 @@ void systick (int time_ms);
 #define UART_4_BASEADDR				0x40004C00UL
 #define UART_5_BASEADDR				0x40005000UL
 
+#define SYSCFG_EXTICR1				((__vo uint32_t *)(SYSCFG_BASEADDR + 0x08))
+#define SYSCFG_EXTICR2				((__vo uint32_t *)(SYSCFG_BASEADDR + 0x0C))
+#define SYSCFG_EXTICR3				((__vo uint32_t *)(SYSCFG_BASEADDR + 0x10))
+#define SYSCFG_EXTICR4				((__vo uint32_t *)(SYSCFG_BASEADDR + 0x14))
+
 ////////////////////////////////////// FOR DELETE
 #define EXTI_OFFSET 0x40010400UL
 #define RRC_OFFSET 0x40021000UL
@@ -312,6 +317,25 @@ typedef struct{
 #define IRQ_NO_SPI2					36
 #define IRQ_NO_SPI3					51
 
+/*
+ * IRQ_numbers
+ */
+#define EXTI_0							0
+#define EXTI_1							1
+#define EXTI_2							2
+#define EXTI_3							3
+#define EXTI_4							4
+#define EXTI_5							5
+#define EXTI_6							6
+#define EXTI_7							7
+#define EXTI_8							8
+#define EXTI_9							9
+#define EXTI_10							10
+#define EXTI_11							11
+#define EXTI_12							12
+#define EXTI_13							13
+#define EXTI_14							14
+#define EXTI_15							15
 
 /*
  * SPI registers

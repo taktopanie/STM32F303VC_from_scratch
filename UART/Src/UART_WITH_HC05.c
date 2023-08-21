@@ -31,6 +31,8 @@ char buff [MAX_BUFF];
 //variable which is used to count the number of char received throiught UART
 uint8_t tmp = 0;
 
+uint8_t BLUETOOTH_STATUS = 0;
+
 void UARTGPIOInit(void){
 
 PeriClockControl(GPIOA, CLOCK_ENABLE);
@@ -77,6 +79,22 @@ void LED_init(){
 	GPIO_Init(&GPIO_T);
 }
 
+void Blue_Pin_en(){
+	PeriClockControl(GPIOD, CLOCK_ENABLE);
+	GPIO_Handle_t GPIO_Pins ;
+
+	GPIO_Pins.GPIO_Regdef = GPIOD;
+	GPIO_Pins.GPIO_config.Pin_Mode = GPIO_MODE_INPUT;
+	GPIO_Pins.GPIO_config.Pin_Output_Type = GPIO_PUSH_PULL;
+	GPIO_Pins.GPIO_config.Pin_Pull = GPIO_PULL_DOWN;
+	GPIO_Pins.GPIO_config.Pin_Speed = GPIO_SPEED_HIGH;
+	GPIO_Pins.GPIO_config.Pin_Number = GPIO_PIN_1;
+	GPIO_Init(&GPIO_Pins);
+
+	GPIO_interrupt_set(EDGE_BOTH, GPIO_PIN_1);
+	GPIO_EXTI_PortMap(EXTI_1, GPIOD);
+	GPIO_IRQITConfig(IRQ_NO_EXTI1, ENABLE);
+}
 
 int main(void)
 {
@@ -92,10 +110,15 @@ int main(void)
 
 	LED_init();
 
+	Blue_Pin_en();
+
+	//While bluetooth is not connected
+	while(!BLUETOOTH_STATUS);
+
 	char WELCOME_TEXT [] = "Microcontroler STM32F303VC\r\nReady to work...\r\nTurning on the LED's\r\nD[n]_[ON/OFF] -- where n=led nr[1-2]\r\n";
 	//send string with NULL value at the end(if not needed -1 from sizeof)
 
-	//TODO: WHILE BLUETOOTH CONNECTED...
+	//TODO: SENDING STRING CALLS EXTI1_IRQHandler
 	UART_SendString(UART_1_handler.USART,WELCOME_TEXT, (sizeof(WELCOME_TEXT)-1));
 
 	/* Loop forever */
@@ -166,4 +189,19 @@ void USART1_EXTI25_IRQHandler(){
 
 	}
 
+}
+
+void EXTI1_IRQHandler(){
+	//IF PIN8 == high
+	if(EXTI->PR1 & (1 << 1)){
+	if(GPIOD->IDR & (1 << 1)){
+		printf("Bluetooth connected\n");
+		GPIO_TogglePin(GPIOE, GPIO_PIN_15);
+		BLUETOOTH_STATUS = 1;
+	}else if(!(GPIOD->IDR & (1 << 1))){
+		printf("Bluetooth disconnected\n");
+		BLUETOOTH_STATUS = 0;
+	}
+	GPIO_IRQHandling(GPIO_PIN_1);
+	}
 }
