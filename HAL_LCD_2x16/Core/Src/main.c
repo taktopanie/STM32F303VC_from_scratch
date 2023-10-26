@@ -89,6 +89,15 @@ int main(void)
   /* USER CODE BEGIN 2 */
   lcd_init();
   lcd_send_text("Hello World");
+
+  uint32_t command = (SET_DDRAM_ADDR)|(0x40);
+  lcd_send_command(command);
+
+  command = (LCD_ONOFF | LCD_DISPLAY_ON | LCD_COURSOR_OFF | LCD_BLINKINGCOURSOR_OFF);
+  lcd_send_command(command);
+
+  lcd_send_text("Second line");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -96,7 +105,20 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+	  for(int i = 0; i <16; i++){
+		  lcd_send_command(LCD_CURSOR_DISPLAY_SHIFT|DISPLAY_SHIFT|SHIFT_RIGHT);
+		  HAL_Delay(1000);
+	  }
 
+	  for(int i = 0; i <(16+ 11); i++){
+		  lcd_send_command(LCD_CURSOR_DISPLAY_SHIFT|DISPLAY_SHIFT|SHIFT_LEFT);
+		  HAL_Delay(500);
+	  }
+
+	  for(int i = 0; i <11; i++){
+		  lcd_send_command(LCD_CURSOR_DISPLAY_SHIFT|DISPLAY_SHIFT|SHIFT_RIGHT);
+		  HAL_Delay(1000);
+	  }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
