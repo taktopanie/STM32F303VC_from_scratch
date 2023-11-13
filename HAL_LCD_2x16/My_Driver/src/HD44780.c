@@ -37,6 +37,7 @@ void Reset_E (void)
 }
 
 
+extern uint8_t test;
 /*
  * function lcd_init
  */
@@ -106,6 +107,12 @@ void lcd_send_byte(uint8_t byte)
 	Set_E();
 	lcd_sendHalf(byte>>4);
 	HAL_Delay(2);
+	test = read_busy_flag();
+	test = read_busy_flag();
+
+	while(read_busy_flag());
+
+	HAL_Delay(2);
 	Reset_E();
 
 	Set_E();
@@ -143,5 +150,96 @@ void lcd_send_text(char *text){
 	while(*text){
 		lcd_send_data(*text);
 		text++;
+	}
+}
+
+uint8_t lcd_readHalf(void){
+	uint8_t data = 0;
+	if(HAL_GPIO_ReadPin(LCD_DATA_4_PORT, LCD_DATA_4_PIN)){
+		data |= (1<<0);
+		}else{data &= ~(1<<0);}
+
+	if(HAL_GPIO_ReadPin(LCD_DATA_5_PORT, LCD_DATA_5_PIN)){
+		data |= (1<<1);
+		}else{data &= ~(1<<1);}
+
+	if(HAL_GPIO_ReadPin(LCD_DATA_6_PORT, LCD_DATA_6_PIN)){
+		data |= (1<<2);
+		}else{data &= ~(1<<2);}
+
+	if(HAL_GPIO_ReadPin(LCD_DATA_7_PORT, LCD_DATA_7_PIN)){
+		data |= (1<<3);
+		}else{data &= ~(1<<3);}
+
+	return data;
+}
+
+uint8_t lcd_receive_byte(void)
+{
+	uint8_t byte = 0;
+
+	//switch PINOUT to input
+	LCD_DATA_4_PORT->MODER &= ~(3<<LCD_DATA_4_PIN*2);
+	LCD_DATA_4_PORT->PUPDR |=  (2<<LCD_DATA_4_PIN*2);
+	LCD_DATA_5_PORT->MODER &= ~(3<<LCD_DATA_5_PIN*2);
+	LCD_DATA_5_PORT->PUPDR |=  (2<<LCD_DATA_5_PIN*2);
+	LCD_DATA_6_PORT->MODER &= ~(3<<LCD_DATA_6_PIN*2);
+	LCD_DATA_6_PORT->PUPDR |=  (2<<LCD_DATA_6_PIN*2);
+	LCD_DATA_7_PORT->MODER &= ~(3<<LCD_DATA_7_PIN*2);
+	LCD_DATA_7_PORT->PUPDR |=  (2<<LCD_DATA_7_PIN*2);
+	Set_E();
+	HAL_Delay(2);
+	byte = (lcd_readHalf()<<4) & 0xF0;
+	Reset_E();
+
+	Set_E();
+	HAL_Delay(2);
+	byte |= (lcd_readHalf()) & 0x0F;
+	Reset_E();
+
+	//switch PINOUT to output again
+	LCD_DATA_4_PORT->MODER |= (1<<LCD_DATA_4_PIN*2);
+	LCD_DATA_4_PORT->PUPDR &= ~(3<<LCD_DATA_4_PIN*2);
+	LCD_DATA_5_PORT->MODER |= (1<<LCD_DATA_5_PIN*2);
+	LCD_DATA_5_PORT->PUPDR &= ~(3<<LCD_DATA_5_PIN*2);
+	LCD_DATA_6_PORT->MODER |= (1<<LCD_DATA_6_PIN*2);
+	LCD_DATA_6_PORT->PUPDR &= ~(3<<LCD_DATA_6_PIN*2);
+	LCD_DATA_7_PORT->MODER |= (1<<LCD_DATA_7_PIN*2);
+	LCD_DATA_7_PORT->PUPDR &= ~(3<<LCD_DATA_7_PIN*2);
+
+	test = byte;
+	return byte;
+
+}
+
+uint8_t read_busy_flag(void){
+
+	uint8_t saved_state = 0;
+	if(HAL_GPIO_ReadPin(LCD_RS_PORT, LCD_RS_PIN)){
+		saved_state |= (1<<0);
+	}
+	if(HAL_GPIO_ReadPin(LCD_RW_PORT, LCD_RW_PIN)){
+		saved_state |= (1<<1);
+	}
+
+	Reset_RS();
+	Set_RW();
+	uint8_t data = lcd_receive_byte();
+
+	if(saved_state & (1 << 0)){
+		Set_RS();
+	}else{
+		Reset_RS();
+	}
+
+	if(saved_state & (1 << 1)){
+		Set_RW();
+	}else{
+		Reset_RW();
+	}
+	if(data&(1<<7)){
+		return 1;
+	}else{
+		return 0;
 	}
 }

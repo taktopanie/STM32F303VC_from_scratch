@@ -107,6 +107,8 @@ void lcd_send_data(unsigned char data);
 
 void lcd_send_text(char *text);
 
-
+uint8_t lcd_readHalf(void);
+uint8_t lcd_receive_byte(void);
+uint8_t read_busy_flag(void);
 
 #endif /* MY_DRIVER_INC_HD44780_H_ */

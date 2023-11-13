@@ -55,7 +55,7 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+volatile uint8_t test;
 /* USER CODE END 0 */
 
 /**
@@ -65,7 +65,7 @@ static void MX_GPIO_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	//TODO: READ BUSY FLAG
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -88,15 +88,64 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
   lcd_init();
-  lcd_send_text("Hello World");
-
+  //lcd_send_text("Hello World");
   uint32_t command = (SET_DDRAM_ADDR)|(0x40);
   lcd_send_command(command);
+
+//  uint32_t command = (SET_DDRAM_ADDR)|(0x40);
+//  lcd_send_command(command);
 
   command = (LCD_ONOFF | LCD_DISPLAY_ON | LCD_COURSOR_OFF | LCD_BLINKINGCOURSOR_OFF);
   lcd_send_command(command);
 
-  lcd_send_text("Second line");
+  //change b sign in DRAM
+
+  //lcd_send_command(0b00000000);  // 0'th CGRAM sign address
+//	Reset_RS();
+//	Set_RW();
+//	test = lcd_receive_byte();
+
+  //test=read_busy_flag();
+
+
+  Reset_RS();
+  Reset_RW();
+  lcd_send_byte(0b10000000);		//SET DDRAM ADDRESS
+
+  Set_RS();
+  lcd_send_byte(0b00000000);		//SEND DDRAM DATA
+  Reset_RS();
+
+  uint32_t comm = 0;
+
+  for(int i = 0; i <= 7; i++){
+	  comm = (0b01000000)+i; // CGRAM ROW ADDRESS
+	  lcd_send_byte(comm);		//SET CGRAM ADDRESS
+	  HAL_Delay(10);
+	  if(i==7){
+		  Set_RS();
+		  lcd_send_byte(0b00000000);//SEND CGRAM DATA - last row
+		  break;
+	  }
+	  Set_RS();
+	  lcd_send_byte(0b00000001);//SEND CGRAM DATA
+	  Reset_RS();
+	  HAL_Delay(10);
+  }
+
+  ////////////////////////set 0 position
+  Reset_RS();
+  Reset_RW();
+  lcd_send_byte(0b10000000);
+  //////////////////////////// send character
+  Set_RS();
+  lcd_send_byte(0b00000000);
+  //////////////////////////////////////////
+
+
+
+
+  //lcd_send_text("Second line");
 
   /* USER CODE END 2 */
 
@@ -104,7 +153,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
 	  for(int i = 0; i <16; i++){
 		  lcd_send_command(LCD_CURSOR_DISPLAY_SHIFT|DISPLAY_SHIFT|SHIFT_RIGHT);
 		  HAL_Delay(1000);
@@ -119,6 +167,8 @@ int main(void)
 		  lcd_send_command(LCD_CURSOR_DISPLAY_SHIFT|DISPLAY_SHIFT|SHIFT_RIGHT);
 		  HAL_Delay(1000);
 	  }
+    /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
