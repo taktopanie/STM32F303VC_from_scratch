@@ -100,12 +100,20 @@ void Reset_E (void);
 
 void lcd_init(void);
 
+void lcd_clear(void);
+
 void lcd_sendHalf(uint8_t data);
 void lcd_send_byte(uint8_t byte);
 void lcd_send_command(unsigned char command);
 void lcd_send_data(unsigned char data);
 
 void lcd_send_text(char *text);
+
+uint8_t lcd_readHalf(void);		//not used yet
+uint8_t lcd_receive_byte(void);		//not used yet
+
+void lcd_add_specials(void);
+
 
 
 
