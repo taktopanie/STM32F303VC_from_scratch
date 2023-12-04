@@ -7,23 +7,73 @@
 
 #include <my_GPS.h>
 
+int char2int(char zn)
+{
+	return (zn - 48);
+}
 
 GPS_Position_Data_t GPS_get_position(uint8_t * phrase, uint8_t size)
 {
-	GPS_Position_Data_t _tmp = {0,0,0,0};
-
-	//char char_cmp [5];
-
-	//strncpy(char_cmp, (char*)phrase, 5);
+	GPS_Position_Data_t _tmp = {{0,0,0},0,0,0,0,0,0};
 
 	if(!(strncmp((char*)phrase, "GPGGA", 5)))
 	{
-		uint32_t data_length = data_get(phrase, size, 6);
+		char * tmp_ppt = 0;
+		uint32_t data_length = 0;
 
-	_tmp.Latitude = data_length;
-	_tmp.Longtitude = 1;
-	_tmp.E_W_ind = 1;
-	_tmp.N_S_ind = 1;
+		data_length = data_get(phrase, size, 0 , &tmp_ppt);
+		if(data_length)
+		{
+			_tmp.Time.hours = (char2int(*tmp_ppt))*10 + char2int(*(tmp_ppt+1));
+			_tmp.Time.minutes = char2int(*(tmp_ppt+2))*10 + char2int(*(tmp_ppt+3));
+			_tmp.Time.seconds = char2int(*(tmp_ppt+4))*10 + char2int(*(tmp_ppt+5));
+		}
+
+
+		data_length = data_get(phrase, size, 1 , &tmp_ppt);
+		if(data_length)
+		{
+			_tmp.Latitude_deg = (char2int(*tmp_ppt))*10 + (char2int(*(tmp_ppt+1)));
+			_tmp.Latitude_min = (char2int( *(tmp_ppt+2) ) )*100000 + \
+					(char2int( *(tmp_ppt+3) ))*10000 + \
+					//comma sign
+					(char2int( *(tmp_ppt+5) ))*1000 + \
+					(char2int( *(tmp_ppt+6) ))*100 + \
+					(char2int( *(tmp_ppt+7) ))*10 + \
+					(char2int( *(tmp_ppt+8) ));
+		}
+
+		data_length = data_get(phrase, size, 2 , &tmp_ppt);
+		if(data_length)
+		{
+			_tmp.N_S_ind = *tmp_ppt;
+		}
+
+
+		data_length = data_get(phrase, size, 3 , &tmp_ppt);
+		if(data_length)
+		{
+			_tmp.Longtitude_deg = (char2int( *tmp_ppt) )*100 + \
+					(char2int( *(tmp_ppt+1) )*10) + \
+					(char2int( *(tmp_ppt+2) ));
+			_tmp.Longtitude_min = (char2int( *(tmp_ppt+3) ) )*100000 + \
+					(char2int( *(tmp_ppt+4) ))*10000 + \
+					//comma sign
+					(char2int( *(tmp_ppt+6) ))*1000 + \
+					(char2int( *(tmp_ppt+7) ))*100 + \
+					(char2int( *(tmp_ppt+8) ))*10 + \
+					(char2int( *(tmp_ppt+9) ));
+		}
+
+
+		data_length = data_get(phrase, size, 4 , &tmp_ppt);
+		if(data_length)
+		{
+			_tmp.E_W_ind = *tmp_ppt;
+		}
+
+
+
 	}
 //	else{
 //		_tmp.Latitude = 0;
@@ -34,15 +84,30 @@ GPS_Position_Data_t GPS_get_position(uint8_t * phrase, uint8_t size)
 	return _tmp;
 
 }
+/*
+ * args:
+ * wsk - pointer to phrase from GPS ex. GPGGA...
+ * size - sizeof phrase under wsk pointer
+ * data_ID - data index which has to be decoded			SEE BELOW
+ * ret_data_ppt - char pointer to first letter of the result
+ *
+ * ret:
+ * - number of data under ret_data_ppt which may be decoded
+ *
+ ****************************************************************
+ *
+ * - data_ID example: $GPGGA,aaa,bbb,ccc,ddd,eee...
+ * 		aaa field ID: 0
+ * 		bbb field ID: 1
+ * 		ccc field ID: 2
+ * 		...
+ *
+ ****************************************************************
+ *
+ */
 
-uint32_t data_get(uint8_t* wsk, int size, int data_ID)
+uint32_t data_get(uint8_t* wsk, int size, int data_ID, char ** ret_data_ppt)
 {
-//	//GET data size
-//	int size = 0;
-//	while(*(wsk + size) != '\n')
-//	{
-//		size++;
-//	}
 
 	//make copy of data
 	char table [size];
@@ -68,9 +133,9 @@ uint32_t data_get(uint8_t* wsk, int size, int data_ID)
 	*head = '/';
 	tail = strchr(table, ',');
 
-	//No. of data available
+	//No. of data available and pointer to the data
+	*ret_data_ppt = (char*)(wsk + (head - table) + 1);
 	return ((tail-head) - 1);
-
 
 }
 
