@@ -20,7 +20,7 @@ typedef struct {
 
 GPS_Position_Data_t GPS_get_position(uint8_t * phrase, uint8_t size);
 
-uint32_t data_get(uint8_t* wsk, int data_ID);
+uint32_t data_get(uint8_t* wsk, int size, int data_ID);
 uint32_t get_value_from_datastring(uint8_t* wsk, int data_ID);
 
 #endif /* PERI_DRIVERS_INC_MY_GPS_H_ */

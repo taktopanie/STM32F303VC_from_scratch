@@ -18,7 +18,7 @@ GPS_Position_Data_t GPS_get_position(uint8_t * phrase, uint8_t size)
 
 	if(!(strncmp((char*)phrase, "GPGGA", 5)))
 	{
-		uint32_t data_length = data_get(phrase, 1);
+		uint32_t data_length = data_get(phrase, size, 6);
 
 	_tmp.Latitude = data_length;
 	_tmp.Longtitude = 1;
@@ -35,25 +35,43 @@ GPS_Position_Data_t GPS_get_position(uint8_t * phrase, uint8_t size)
 
 }
 
-uint32_t data_get(uint8_t* wsk, int data_ID)
+uint32_t data_get(uint8_t* wsk, int size, int data_ID)
 {
-	///TODO
-	int size = 0;
-	while(*(wsk + size) != '\n')
+//	//GET data size
+//	int size = 0;
+//	while(*(wsk + size) != '\n')
+//	{
+//		size++;
+//	}
+
+	//make copy of data
+	char table [size];
+	for(int i =0; i < size; i++)
 	{
-		size++;
+		table[i] = *(wsk + i);
 	}
 
-	char table [size];
+	char * tmp = NULL;
 
-	table[0] = 23;
+	// DELETE prev ',' signs
+	for (int i = 0; i < data_ID; i ++){
+		tmp = strchr(table, ',');
+		*tmp = '/';
+	}
+	tmp = NULL;
+
+	//GET HEAD and TAIL of msg with data_ID which will be returned
 	char * head;
 	char * tail;
 
-	head = strchr((char*)wsk, ',');
+	head = strchr(table, ',');
 	*head = '/';
-	tail = strchr((char*)wsk, ',');
-	return (tail - head);
+	tail = strchr(table, ',');
+
+	//No. of data available
+	return ((tail-head) - 1);
+
+
 }
 
 uint32_t get_value_from_datastring(uint8_t* wsk, int data_ID){
