@@ -21,9 +21,17 @@ typedef struct {
 	GPS_time_t Time;
 	uint8_t Latitude_deg;
 	uint32_t Latitude_min;
+
+	//minutes in degrees
+	uint32_t Latitude_minINdegrees;
+
 	uint8_t N_S_ind;
 	uint8_t Longtitude_deg;
 	uint32_t Longtitude_min;
+
+	//minutes in degrees
+	uint32_t Longtitude_minINdegrees;
+
 	uint8_t E_W_ind;
 }GPS_Position_Data_t;
 

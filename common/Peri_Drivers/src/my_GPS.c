@@ -43,6 +43,8 @@ GPS_Position_Data_t GPS_get_position(uint8_t * phrase, uint8_t size)
 					(char2int( *(tmp_ppt+8) ));
 		}
 
+		_tmp.Latitude_minINdegrees = (uint32_t)_tmp.Latitude_min * 166.66667;
+
 		data_length = data_get(phrase, size, 2 , &tmp_ppt);
 		if(data_length)
 		{
@@ -65,6 +67,7 @@ GPS_Position_Data_t GPS_get_position(uint8_t * phrase, uint8_t size)
 					(char2int( *(tmp_ppt+9) ));
 		}
 
+		_tmp.Longtitude_minINdegrees = (uint32_t)(_tmp.Longtitude_min * 166.666667);
 
 		data_length = data_get(phrase, size, 4 , &tmp_ppt);
 		if(data_length)
