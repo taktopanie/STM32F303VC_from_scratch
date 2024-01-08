@@ -10,16 +10,52 @@
 
 #include "stm32f3xx_hal.h"
 
+  /*
+   ######################################################################################
+   # 																					#
+   # 							HOW TO USE THIS DRIVER									#
+   # 																					#
+   ######################################################################################
+   #																					#
+   # 1. Fill the alarm DS3231_Alarm_t structure											#
+   # 2. Call DS3231_set_alarm function with the given alarm structure					#
+   # 3. Fill the DS3231_Time_t stucture with time information							#
+   # 4. Call DS3231_set_time function with the given time structure						#
+   #																					#
+   ######################################################################################
+   #																					#
+   # Provided functions:																#
+   #	1. check the actual time use	: 	DS3231_get_time(&hi2c1) function			#
+   #	2. check the alarm status		: 	DS3231_get_alarm(&hi2c1, ALARM_1)			#
+   #	3. clear the alarm status		:	DS3231_clear_alarm(&hi2c1, ALARM_1)			#
+   #																					#
+   # If the I2C connection will be lost CONNECTION_LOST variable will be turned to != 0	#
+   ######################################################################################
+   */
 
-#define DS3231_address 			0b11010001
+
+#define DS3231_address 								0b11010001
 
 /*
  * @ALARM_NUMBERS
  */
-#define ALARM_1					1
-#define ALARM_2					2
+#define ALARM_1										1
+#define ALARM_2										2
 
-
+/*
+ * @ALARM_TRIGGERS
+ */
+#define		ALARM_1_once_per_sec					0
+#define		ALARM_1_sec_match						1
+#define		ALARM_1_min_sec_match					2
+#define		ALARM_1_hr_min_sec_match				3
+#define		ALARM_1_date_hr_min_sec_match			4
+#define		ALARM_1_day_hr_min_sec_match			5
+#define		ALARM_2_once_per_min					6
+#define 	ALARM_2_min_match						7
+#define 	ALARM_2_hr_min_match					8
+#define 	ALARM_2_date_hr_min_match				9
+#define 	ALARM_2_day_hr_min_match				10
 
 /*
  * DS3231 registers
@@ -51,11 +87,29 @@ typedef struct{
 	uint8_t time_hr;
 	uint8_t time_min;
 	uint8_t time_sec;
+	uint8_t day;
+	uint8_t date;
+	uint8_t month;
+	uint8_t year_100;
 
 }DS3231_Time_t;
 
+/*
+ * @ALARM_STRUCTURE
+ */
+typedef struct
+{
 
+	uint8_t trigger;			//SEE @ALARM_TRIGGERS
 
+	uint8_t day;
+	uint8_t date;
+	uint8_t hr;
+	uint8_t min;
+	uint8_t sec;
+}DS3231_Alarm_t;
+
+extern volatile uint8_t CONNECTION_LOST;
 
 /*
  * Function prototypes
@@ -83,10 +137,21 @@ uint8_t DS3231_set_time(I2C_HandleTypeDef * I2C_PERI, DS3231_Time_t TIME);
  */
 uint8_t DS3231_get_alarm(I2C_HandleTypeDef * I2C_PERI, uint8_t Alarm_No);
 
-void DS3231_set_alarm(I2C_HandleTypeDef * I2C_PERI , uint8_t Alarm_No);
+/*
+ * DS3231_set_alarm - function setss given Alarm IRQ number
+ *
+ * # params:
+ * 	I2C_PERI - pointer to I2C peripheral
+ * 	Alarm_No - number of the given alarm 		SEE @ALARM_NUMBERS
+ *	Alarm_trigger - trigger mode				SEE @ALARM_STRUCTURE
+ *
+ * # returns:
+ *
+ */
+void DS3231_set_alarm(I2C_HandleTypeDef * I2C_PERI , uint8_t Alarm_No, DS3231_Alarm_t Alarm_trigger);
 void DS3231_clear_alarm(I2C_HandleTypeDef * I2C_PERI , uint8_t Alarm_No);
 
 void DS3231_data_write(I2C_HandleTypeDef * I2C_PERI, uint8_t peri_address, uint8_t mem_address, uint8_t* data_to_send, uint8_t data_length);
-void DS3231_data_read(I2C_HandleTypeDef * I2C_PERI, uint8_t peri_address, uint8_t mem_address, uint8_t* read_buffor, uint8_t data_length);
+uint8_t  DS3231_data_read(I2C_HandleTypeDef * I2C_PERI, uint8_t peri_address, uint8_t mem_address, uint8_t* read_buffor, uint8_t data_length);
 
 #endif /* PERI_DRIVERS_INC_DS3231_H_ */
