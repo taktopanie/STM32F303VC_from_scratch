@@ -122,6 +122,19 @@ void MOTOR_right_ULN2003 (void)
 #define _servo_mid		1481
 #define _servo_min		548
 
+
+/*
+ * Function which converts values to different scale
+ *
+ * @param x 		- value which will be converted
+ * @param in_min 	- minimum value of the input
+ * @param in_max	- maximum value of the input
+ * @param out_min	- minimum value of the converted signal
+ * @param out_max	- maximum value of the converted signal
+ *
+ * @return 			- coverted value (value between out_min and out_max)
+ */
+
 long _map(long x, long in_min, long in_max, long out_min, long out_max);
 
 void SERVO_set_LEFT_MAX(TIM_HandleTypeDef *htim)

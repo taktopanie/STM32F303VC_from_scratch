@@ -38,6 +38,13 @@ void MOTOR_right_ULN2003 (void);
 /////////////////////////////// SERVO CONTROL ///////////////////////////////
 
 /*
+ * SERVO SG90 - SHOULD BE CONNECTED TO THE TIMER WITH SETTINGS
+ * Timer mode: 		TIM_OCMODE_PWM1;
+ * Prescaler:		47
+ * Counter:			20119
+ */
+
+/*
  * SERVO FUNCTION DEFINITIONS
  */
 void SERVO_set_LEFT_MAX(TIM_HandleTypeDef *htim);
