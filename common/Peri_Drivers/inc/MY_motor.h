@@ -11,6 +11,7 @@
 #include "stm32f3xx_hal.h"
 #include "stm32f3xx_hal_gpio.h"
 #include "stm32f3xx.h"
+#include "stm32f3xx_hal_tim.h"
 
 ///////////////////// STEPPER MOTOR WITH ULN2003 DRIVER /////////////////////
 /*
