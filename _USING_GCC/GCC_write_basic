@@ -1,0 +1,5 @@
+maciej@mac-desktop:~/Desktop/moje/programming/STM32/STM32_Workspace/GPIO_IRQ$ arm-none-eabi-gcc ./Src/* ./Drivers/Src/GPIO_lib.c ./Startup/startup_stm32f303vctx.s -T STM32F303VCTX_FLASH.ld -I ./Drivers/Inc/ -o stm_file.elf -mcpu=cortex-m4 -mthumb
+
+maciej@mac-desktop:~/Desktop/moje/programming/STM32/STM32_Workspace/GPIO_IRQ$ arm-none-eabi-objcopy -O binary stm_file.elf stm_file.bin
+
+maciej@mac-desktop:~/Desktop/moje/programming/STM32/STM32_Workspace/GPIO_IRQ$ st-flash write stm_file.bin 0x08000000
