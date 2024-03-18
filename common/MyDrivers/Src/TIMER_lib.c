@@ -254,3 +254,19 @@ void TIMER_interrupt_set(Timer_RegDef* wsk_tim){
 	}
 }
 
+void TIMER_DeInit(Timer_Handle_t* tim)
+{
+	tim->TIMER = 0;
+	tim->TIM_ARR = 0;
+	tim->TIM_COUNTER_mode = 0;
+	tim->TIM_EDGE_TRIGGER = 0;
+	tim->TIM_FILTERING = 0;
+	tim->TIM_INT_PRSC = 0;
+	tim->TIM_ONEPULSE = 0;
+	tim->TIM_PRESCALLER = 0;
+	tim->TIM_PWM_INVERTED_MODE = 0;
+	tim->TIM_PWM_WIDTH_PERCENT = 0;
+
+
+
+}

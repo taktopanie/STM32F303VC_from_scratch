@@ -44,11 +44,12 @@ int main (void){
 	GPIOInits();
 
 	Timer_Handle_t timer;
+
+	TIMER_DeInit(&timer);
 	timer.TIMER = TIMER2;
 	timer.TIM_ARR = (1000-1);
 	timer.TIM_PRESCALLER = 800;
 	timer.TIM_COUNTER_mode= COUNTER_MODE_DOWN;
-	//timer.TIM_OnePulse_mode = 1;
 
 	Timer_Init_FREE_RUN(&timer);
 	TIMER_interrupt_set(timer.TIMER);

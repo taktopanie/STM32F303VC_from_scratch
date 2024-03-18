@@ -8,8 +8,7 @@
 #ifndef INC_TIMER_LIB_H_
 #define INC_TIMER_LIB_H_
 
-//#include<stm32f3xx.h>
-#include "../../MyDrivers/Inc/stm32f3xx.h"
+#include<stm32f3xx.h>
 
 #define __vo volatile
 
@@ -176,5 +175,7 @@ void Timer_IRQ_handling(Timer_RegDef* TIMER_handler);
 void Timer_indicate_time(Timer_RegDef* timer);
 
 void TIMER_interrupt_set(Timer_RegDef* wsk_tim);
+
+void TIMER_DeInit(Timer_Handle_t* tim);
 
 #endif /* INC_TIMER_LIB_H_ */

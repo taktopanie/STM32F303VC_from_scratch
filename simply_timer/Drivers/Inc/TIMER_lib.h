@@ -176,4 +176,6 @@ void Timer_indicate_time(Timer_RegDef* timer);
 
 void TIMER_interrupt_set(Timer_RegDef* wsk_tim);
 
+void TIMER_DeInit(Timer_Handle_t* tim);
+
 #endif /* INC_TIMER_LIB_H_ */
