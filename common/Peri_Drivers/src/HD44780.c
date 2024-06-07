@@ -53,6 +53,7 @@ void lcd_init(void){
 	Set_RS();
 	Set_RW();
 	Set_E();
+	HAL_Delay(5);
 	// wyzerowanie pinow RS,RW,E
 	Reset_RS();
 	Reset_RW();
