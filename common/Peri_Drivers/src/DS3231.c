@@ -10,6 +10,8 @@
 //variable which indicates I2C BUS error
 volatile uint8_t CONNECTION_LOST = 0;
 
+volatile uint8_t I2C_DATA_RECEIVED = 0;
+
 /*
  * function converting decimal number to hexadecimal
  */
@@ -179,6 +181,29 @@ uint8_t DS3231_set_time(I2C_HandleTypeDef * I2C_PERI, DS3231_Time_t TIME){
 //	}
 
 	return 0;
+}
+
+
+DS3231_Time_t DS3231_get_time_IT(I2C_HandleTypeDef * I2C_PERI)
+{
+	DS3231_Time_t tmp_data = {0, 0, 0, 0, 0, 0, 0};
+	uint8_t BUFFOR [10];
+
+	I2C_DATA_RECEIVED = 0;
+	DS3231_data_read_IT(I2C_PERI, DS3231_address, DS3231_seconds_addr, BUFFOR, 7);
+
+	//I2C_DATA_RECEIVED variable has to be setted up in HAL_I2C_MemRxCpltCallback
+	while(!I2C_DATA_RECEIVED);
+
+	tmp_data.time_sec = (BUFFOR[0] & 0xF) + 10*((BUFFOR[0] >> 4) & 0x7);
+	tmp_data.time_min = (BUFFOR[1] & 0xF) + 10*((BUFFOR[1] >> 4) & 0x7);
+	tmp_data.time_hr = (BUFFOR[2] & 0xF) + 10*((BUFFOR[2] >> 4) & 0x3);
+	tmp_data.day = (BUFFOR[3] & 0x7);
+	tmp_data.date = (BUFFOR[4] & 0xF) + 10*((BUFFOR[4] >> 4) & 0x3);
+	tmp_data.month = (BUFFOR[5] & 0xF) + 10*((BUFFOR[5] >> 4) & 0x1);
+	tmp_data.year_100 = (BUFFOR[6] & 0xF) + 10*((BUFFOR[6] >> 4) & 0xF);
+
+	return tmp_data;
 }
 
 void DS3231_set_alarm(I2C_HandleTypeDef * I2C_PERI , uint8_t Alarm_No, DS3231_Alarm_t Alarm_trigger){
@@ -412,5 +437,24 @@ uint8_t DS3231_data_read(I2C_HandleTypeDef * I2C_PERI, uint8_t peri_address, uin
 		return(RET_STATUS);
 	}
 	RET_STATUS = HAL_I2C_Master_Receive(I2C_PERI, peri_address, read_buffor, data_length, 100);
+	return(RET_STATUS);
+}
+
+/*
+ * DS3231_data_read_IT - read the data from DS3231 with IT
+ *
+ * @params:
+ * 	I2C_PERI				- BUS address pointer (I2C)
+ * 	peri_address			- address of peripheral (device)
+ * 	mem_address				- memory address
+ * 	read_buffor				- buffor which will be refiled with the read data
+ * 	data_length				- number of data which will be received
+ *
+ */
+uint8_t DS3231_data_read_IT(I2C_HandleTypeDef * I2C_PERI, uint8_t peri_address, uint8_t mem_address, uint8_t* read_buffor, uint8_t data_length)
+{
+	uint8_t RET_STATUS;
+	RET_STATUS = HAL_I2C_Mem_Read_IT(I2C_PERI, peri_address, (unsigned char)mem_address, 1, read_buffor, data_length);
+
 	return(RET_STATUS);
 }

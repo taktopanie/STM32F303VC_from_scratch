@@ -111,6 +111,8 @@ typedef struct
 
 extern volatile uint8_t CONNECTION_LOST;
 
+extern volatile uint8_t I2C_DATA_RECEIVED;
+
 /*
  * Function prototypes
  */
@@ -119,6 +121,14 @@ extern volatile uint8_t CONNECTION_LOST;
  * DS3231_get_time - function which returns DS3231_Time_t format time
  */
 DS3231_Time_t DS3231_get_time(I2C_HandleTypeDef * I2C_PERI);
+
+/*
+ * DS3231_get_time in IT mode - function which returns DS3231_Time_t format time
+ *
+ * note: I2C_DATA_RECEIVED variable has to be setted up in HAL_I2C_MemRxCpltCallback
+ *
+ */
+DS3231_Time_t DS3231_get_time_IT(I2C_HandleTypeDef * I2C_PERI);
 
 /*
  * DS3231_set_time - function which sets RTC by DS3231_Time_t format time
@@ -154,4 +164,5 @@ void DS3231_clear_alarm(I2C_HandleTypeDef * I2C_PERI , uint8_t Alarm_No);
 void DS3231_data_write(I2C_HandleTypeDef * I2C_PERI, uint8_t peri_address, uint8_t mem_address, uint8_t* data_to_send, uint8_t data_length);
 uint8_t  DS3231_data_read(I2C_HandleTypeDef * I2C_PERI, uint8_t peri_address, uint8_t mem_address, uint8_t* read_buffor, uint8_t data_length);
 
+uint8_t DS3231_data_read_IT(I2C_HandleTypeDef * I2C_PERI, uint8_t peri_address, uint8_t mem_address, uint8_t* read_buffor, uint8_t data_length);
 #endif /* PERI_DRIVERS_INC_DS3231_H_ */
