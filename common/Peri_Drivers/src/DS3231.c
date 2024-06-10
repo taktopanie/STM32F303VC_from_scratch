@@ -26,12 +26,12 @@ DS3231_Time_t DS3231_get_time(I2C_HandleTypeDef * I2C_PERI)
 	uint8_t BUFFOR [10];
 
 	//IF connection was lost reset I2C (I2C1 CR address = 0x40005400) periph
-//	if(CONNECTION_LOST){
-//		uint32_t* wsk = (uint32_t*)0x40005400;
-//		*wsk &= ~(1 << 0);
-//		*wsk |= (1 << 0);
-//		CONNECTION_LOST = 0;
-//	}
+	if(CONNECTION_LOST){
+		uint32_t* wsk = (uint32_t*)0x40005400;
+		*wsk &= ~(1 << 0);
+		*wsk |= (1 << 0);
+		CONNECTION_LOST = 0;
+	}
 
 	if(!(DS3231_data_read(I2C_PERI, DS3231_address, DS3231_seconds_addr, BUFFOR, 7)))
 	{
